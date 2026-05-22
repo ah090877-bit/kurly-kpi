@@ -9,216 +9,243 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', 'Pretendard', 'Malgun Gothic', sans-serif; background-color: #f8fafc; }
-        .kpi-card { border-top: 4px solid transparent; transition: all 0.3s ease; }
-        .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgb(0 0 0 / 0.08); }
+        body { font-family: 'Inter', 'Pretendard', sans-serif; background-color: #f8fafc; color: #0f172a; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Light Mode KPI Card */
+        .kpi-card { background: #ffffff; border: 1px solid #e2e8f0; border-top-width: 4px; transition: transform 0.2s, box-shadow 0.2s; }
+        .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        
+        /* Sidebar Nav Item */
+        .nav-item.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); font-weight: 700;}
+        .nav-item { color: #64748b; transition: all 0.2s; font-weight: 600;}
+        .nav-item:hover:not(.active) { background-color: #f1f5f9; color: #0f172a; }
+        
+        input, select { transition: border-color 0.2s; }
+        input:focus, select:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
+        
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; border: 2px solid #f1f5f9; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        input[type="date"], input[type="number"], input[type="time"] { transition: all 0.2s; }
-        input[type="date"]:focus, input[type="number"]:focus, input[type="time"]:focus { transform: scale(1.02); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen pb-10">
+<body class="flex h-screen overflow-hidden">
 
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm/50">
-        <div class="max-w-[1800px] mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-2 rounded-xl shadow-md">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold text-slate-900 leading-tight tracking-tight">물류운영 KPI 대시보드</h1>
-                    <p class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Power BI Styled Analytics System</p>
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col z-20 shadow-sm shrink-0">
+        <div class="h-20 flex items-center px-6 border-b border-slate-100">
+            <div class="bg-blue-600 p-2 rounded-lg mr-3 shadow-md shadow-blue-500/30">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+            </div>
+            <div>
+                <h1 class="text-sm font-extrabold text-slate-900 tracking-tight">Horizon Logistics</h1>
+                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">KPI Dashboard</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <p class="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Views</p>
+            <button onclick="setNavView('YEARLY')" id="nav-YEARLY" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                <span class="text-lg">📊</span> 연간 KPI
+            </button>
+            <button onclick="setNavView('MONTHLY')" id="nav-MONTHLY" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                <span class="text-lg">📈</span> 월별 KPI
+            </button>
+            <button onclick="setNavView('DAILY')" id="nav-DAILY" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
+                <span class="text-lg">📋</span> 일별 상세
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+            <button onclick="downloadExcel()" class="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center transition shadow-sm gap-2">
+                <span>⬇️</span> 현재화면 엑셀 추출
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+        <header class="h-20 bg-white/90 backdrop-blur border-b border-slate-200 flex items-center justify-between px-8 z-10 shrink-0">
+            <div id="viewHeaderContext" class="flex items-center gap-4">
+                <h2 id="currentViewTitle" class="text-xl font-extrabold text-slate-800">연간 KPI 요약</h2>
+                <div id="dailyToggleGroup" class="hidden bg-slate-100 p-1 rounded-lg flex items-center ml-4 border border-slate-200">
+                    <button onclick="setSubView('WEEK')" id="subnav-WEEK" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition">주차별 보기</button>
+                    <button onclick="setSubView('DAY')" id="subnav-DAY" class="px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition">일별 보기</button>
                 </div>
             </div>
+
             <div class="flex items-center gap-3">
-                <button onclick="fetchDataFromGoogle()" class="bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 text-slate-700 text-sm font-semibold py-2 px-4 rounded-lg flex items-center transition shadow-sm gap-2">
-                    <span id="syncIcon">🔄</span> 최신 DB 동기화
+                <select id="monthSelector" onchange="updateDashboard()" class="hidden bg-white border border-slate-300 text-sm font-bold text-blue-600 rounded-lg px-4 py-2 focus:ring-1 focus:ring-blue-500 shadow-sm cursor-pointer hover:bg-slate-50">
+                    <option value="01">1월 데이터</option><option value="02">2월 데이터</option><option value="03">3월 데이터</option>
+                    <option value="04">4월 데이터</option><option value="05">5월 데이터</option><option value="06">6월 데이터</option>
+                    <option value="07">7월 데이터</option><option value="08">8월 데이터</option><option value="09">9월 데이터</option>
+                    <option value="10">10월 데이터</option><option value="11">11월 데이터</option><option value="12">12월 데이터</option>
+                </select>
+
+                <button onclick="fetchDataFromGoogle()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg flex items-center transition shadow-md gap-2">
+                    <span id="syncIcon">🔄</span> 데이터 동기화
                 </button>
-                <button onclick="downloadExcel()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-sm font-semibold py-2 px-4 rounded-lg flex items-center transition shadow-md gap-2">
-                    <span>📊</span> 현재화면 엑셀 추출
-                </button>
             </div>
-        </div>
-    </nav>
+        </header>
 
-    <div class="max-w-[1800px] mx-auto px-6 mt-6 space-y-6">
-        
-        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center">
-            <div class="flex items-center gap-3">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-2 py-1 rounded-md">분석 기간 설정</span>
-                <select id="monthFilter" onchange="updateDashboard()" class="bg-transparent border-none text-sm font-bold text-blue-700 focus:outline-none cursor-pointer hover:text-blue-800 transition">
-                    </select>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-10 gap-3">
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm kpi-card relative overflow-hidden xl:col-span-1" style="border-top-color: #3b82f6;">
-                <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider">누적 물동량 (BOX)</p>
-                <p id="kpi-box" class="text-2xl font-extrabold text-slate-800 mt-1 truncate tracking-tight">0</p>
-                <p class="text-[9px] xl:text-[10px] text-slate-400 mt-2 flex justify-between font-medium"><span>전체 출고량</span><span class="text-blue-500 font-bold bg-blue-50 px-1.5 py-0.5 rounded">100%</span></p>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm kpi-card relative overflow-hidden xl:col-span-1" style="border-top-color: #6366f1;">
-                <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider">차량당 생산성(건)</p>
-                <p id="kpi-prod" class="text-2xl font-extrabold text-indigo-600 mt-1 truncate tracking-tight">0</p>
-                <p class="text-[9px] xl:text-[10px] text-slate-400 mt-2 font-medium">평균 처리 CAPA</p>
-            </div>
+        <div class="flex-1 overflow-y-auto p-8 space-y-6">
             
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm kpi-card relative overflow-hidden xl:col-span-2" style="border-top-color: #64748b;">
-                <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider">총 정산 매출액</p>
-                <p id="kpi-revenue" class="text-2xl font-extrabold text-slate-800 mt-1 truncate tracking-tight">0</p>
-                <p class="text-[9px] xl:text-[10px] text-slate-400 mt-2 font-medium">단가: 1,070원</p>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm kpi-card relative overflow-hidden xl:col-span-2" style="border-top-color: #10b981;">
-                <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider">영업 순이익</p>
-                <p id="kpi-profit" class="text-2xl font-extrabold text-emerald-600 mt-1 truncate tracking-tight">0</p>
-                <p class="text-[9px] xl:text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-1.5 py-0.5 rounded">마진율: 2.99%</p>
-            </div>
-            
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm kpi-card relative overflow-hidden xl:col-span-1" style="border-top-color: #8b5cf6;">
-                <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider truncate">박스분포율(점착)</p>
-                <p id="kpi-drop-size" class="text-2xl font-extrabold text-purple-600 mt-1 truncate tracking-tight">0</p>
-                <p class="text-[9px] xl:text-[10px] text-slate-400 mt-2 font-medium truncate">가구당 배송 박스</p>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm kpi-card relative overflow-hidden xl:col-span-1" style="border-top-color: #f59e0b;">
-                <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider truncate">용차 의존도</p>
-                <p id="kpi-hired" class="text-2xl font-extrabold text-amber-600 mt-1 truncate tracking-tight">0%</p>
-                <p class="text-[9px] xl:text-[10px] text-slate-400 mt-2 font-medium truncate">단기 스팟 비율</p>
-            </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm kpi-card relative overflow-hidden xl:col-span-1" style="border-top-color: #06b6d4;">
-                <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider truncate">단회 운행 비율</p>
-                <p id="kpi-single" class="text-2xl font-extrabold text-cyan-600 mt-1 truncate tracking-tight">0%</p>
-                <p class="text-[9px] xl:text-[10px] text-slate-400 mt-2 font-medium truncate">1/3회차 단회</p>
-            </div>
-            
-            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm kpi-card flex flex-col justify-between xl:col-span-1" style="border-top-color: #ef4444;">
-                <div>
-                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-400 tracking-wider flex justify-between items-center truncate">
-                        지연 배송률 <span id="kpi-success" class="text-[8px] font-bold text-emerald-500 bg-emerald-50 px-1 rounded ml-1"></span>
-                    </p>
-                    <p id="kpi-delay" class="text-2xl font-black text-slate-800 mt-1 truncate tracking-tight">0%</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-10 gap-3">
+                <div class="kpi-card p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #64748b;">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-slate-100 rounded-bl-full"></div>
+                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">총 정산 매출액</p>
+                    <p id="kpi-revenue" class="text-3xl font-black text-slate-800 mt-1 truncate tracking-tight">0</p>
+                    <p class="text-[10px] text-slate-400 mt-2 font-medium">단가 고정: 1,070원</p>
                 </div>
-                <div class="flex items-center gap-1.5 mt-2 text-[8px] font-bold bg-slate-50 p-1.5 rounded-lg justify-center truncate">
-                    <span class="text-rose-600">🔴 >3%</span>
-                    <span class="text-amber-500">🟡 >1%</span>
+                <div class="kpi-card p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #10b981;">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-emerald-50 rounded-bl-full"></div>
+                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">영업 순이익</p>
+                    <p id="kpi-profit" class="text-3xl font-black text-emerald-600 mt-1 truncate tracking-tight">0</p>
+                    <p class="text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-2 py-0.5 rounded border border-emerald-100">마진율: 2.99%</p>
                 </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
-            <div class="xl:col-span-3 space-y-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 id="trendChartTitle" class="text-base font-bold text-slate-800">기간별 물동량 및 차량당 생산성 추이</h3>
-                        <div class="flex items-center gap-4 text-xs font-bold text-slate-500">
-                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-500 inline-block shadow-sm"></span>총 물동량(BOX)</span>
-                            <span class="flex items-center gap-1.5"><span class="w-4 h-1 rounded-full bg-indigo-600 inline-block shadow-sm"></span>차량당 생산성</span>
-                        </div>
+                <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #3b82f6;">
+                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">누적 물동량 (BOX)</p>
+                    <p id="kpi-box" class="text-2xl font-extrabold text-slate-800 mt-1 truncate">0</p>
+                    <p class="text-[10px] text-blue-600 font-bold mt-2 bg-blue-50 inline-block px-1 rounded">전체 출고</p>
+                </div>
+                <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #6366f1;">
+                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">생산성 (건/대)</p>
+                    <p id="kpi-prod" class="text-2xl font-extrabold text-indigo-600 mt-1 truncate">0</p>
+                    <p class="text-[10px] text-slate-400 mt-2">차량 평균 CAPA</p>
+                </div>
+                <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #8b5cf6;">
+                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">박스분포율</p>
+                    <p id="kpi-drop-size" class="text-2xl font-extrabold text-purple-600 mt-1 truncate">0</p>
+                    <p class="text-[10px] text-slate-400 mt-2">가구당 점착수</p>
+                </div>
+                <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #f59e0b;">
+                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">용차 의존도</p>
+                    <p id="kpi-hired" class="text-2xl font-extrabold text-amber-600 mt-1 truncate">0%</p>
+                    <p class="text-[10px] text-slate-400 mt-2">단기 스팟 비율</p>
+                </div>
+                <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #06b6d4;">
+                    <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">단회 운행</p>
+                    <p id="kpi-single" class="text-2xl font-extrabold text-cyan-600 mt-1 truncate">0%</p>
+                    <p class="text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
+                </div>
+                <div class="kpi-card p-4 rounded-2xl xl:col-span-1 flex flex-col justify-between" style="border-top-color: #ef4444;">
+                    <div>
+                        <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider flex justify-between items-center truncate">
+                            지연배송율 <span id="kpi-success" class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 ml-1"></span>
+                        </p>
+                        <p id="kpi-delay" class="text-2xl font-black text-slate-800 mt-1 truncate">0%</p>
                     </div>
-                    <div class="h-[280px] w-full"><canvas id="trendChart"></canvas></div>
+                    <div class="flex items-center gap-1.5 mt-2 text-[9px] font-bold text-slate-500">
+                        <span class="text-rose-600 bg-rose-50 px-1 rounded">>3%</span>
+                        <span class="text-amber-500 bg-amber-50 px-1 rounded">>1%</span>
+                    </div>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="mb-4 flex justify-between items-start">
-                            <div>
-                                <h3 id="scatterChartTitle" class="text-base font-bold text-slate-800">기간별 차량 투입 효율 추이</h3>
-                                <p class="text-[10px] text-slate-400 mt-1.5 font-medium">※ Y축: 가구수/대 | 점 색상: 🔴 과투입(<35) / 🟢 적정 / 🟡 과소투입(>50)</p>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                <div class="xl:col-span-3 space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 id="trendChartTitle" class="text-base font-bold text-slate-800">기간별 물동량 및 차량당 생산성 추이</h3>
+                            <div class="flex items-center gap-4 text-xs font-bold text-slate-500">
+                                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-500 shadow-sm"></span>총 물동량(BOX)</span>
+                                <span class="flex items-center gap-1.5"><span class="w-4 h-1 rounded-full bg-indigo-600 shadow-sm"></span>차량당 생산성</span>
                             </div>
                         </div>
-                        <div class="h-[240px] w-full"><canvas id="scatterChart"></canvas></div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="mb-4">
-                            <h3 class="text-base font-bold text-slate-800">회차별 배송 가구수 공급 구조</h3>
-                            <p class="text-[10px] text-slate-400 mt-1.5 font-medium">※ 1차 vs 3차 배송 비중 분석</p>
-                        </div>
-                        <div class="h-[240px] w-full"><canvas id="roundChart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm h-fit sticky top-24">
-                <div class="border-b border-slate-100 pb-4 mb-5 flex justify-between items-center">
-                    <h3 class="text-base font-bold text-slate-800">✍️ 실시간 운영 기입</h3>
-                    <button onclick="openDataModal()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1.5 rounded-md font-bold transition">복원</button>
-                </div>
-                
-                <div id="dataFormContainer" class="space-y-3.5">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="col-span-2">
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1.5">운영 일자 (필수)</label>
-                            <input type="date" id="i-date" class="w-full border border-slate-200 p-2.5 rounded-lg text-sm bg-slate-50 font-medium outline-none">
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1.5">총 출고 물동량 (BOX)</label>
-                            <input type="number" id="i-box" class="w-full border border-blue-200 p-2.5 rounded-lg text-sm font-bold bg-blue-50 text-blue-700 outline-none" placeholder="0">
-                        </div>
-                        
-                        <div class="col-span-2 pt-3 border-t border-slate-100 mt-1"><span class="text-xs font-extrabold text-slate-700 bg-slate-100 px-2 py-1 rounded">🚚 마스터 배차</span></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">지입 정규</label><input type="number" id="i-owned" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">스팟 용차</label><input type="number" id="i-hired" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-
-                        <div class="col-span-2 pt-3 border-t border-slate-100 mt-1"><span class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">🔄 1회차 라우팅</span></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">가구수</label><input type="number" id="i-r1-house" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">배차 대수</label><input type="number" id="i-r1-veh" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-                        <div class="col-span-2"><label class="block text-[10px] font-semibold text-slate-500 mb-1">단회 운행</label><input type="number" id="i-r1-sin" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-
-                        <div class="col-span-2 pt-3 border-t border-slate-100 mt-1"><span class="text-xs font-extrabold text-cyan-600 bg-cyan-50 px-2 py-1 rounded">🔄 3회차 라우팅</span></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">가구수</label><input type="number" id="i-r3-house" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">배차 대수</label><input type="number" id="i-r3-veh" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-                        <div class="col-span-2"><label class="block text-[10px] font-semibold text-slate-500 mb-1">단회 운행</label><input type="number" id="i-r3-sin" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none" placeholder="0"></div>
-
-                        <div class="col-span-2 pt-3 border-t border-slate-100 mt-1"><span class="text-xs font-extrabold text-slate-700 bg-slate-100 px-2 py-1 rounded">⏰ 접안 및 품질</span></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">간선 막차</label><input type="time" id="i-time-trunk" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none"></div>
-                        <div><label class="block text-[10px] font-semibold text-slate-500 mb-1">최종 출차</label><input type="time" id="i-time-depart" class="w-full border border-slate-200 p-2 rounded-lg text-xs outline-none"></div>
-                        <div class="col-span-2">
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1.5">미배송 마감 지연율 (%)</label>
-                            <input type="number" step="0.01" id="i-delay" class="w-full border border-rose-200 p-2.5 rounded-lg text-sm font-bold bg-rose-50 text-rose-700 outline-none" placeholder="0.00">
-                        </div>
+                        <div class="h-[280px] w-full"><canvas id="trendChart"></canvas></div>
                     </div>
                     
-                    <button type="button" onclick="saveDataToGoogle()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition mt-5 shadow-lg shadow-slate-900/20 text-sm">
-                        데이터베이스에 전송하기
-                    </button>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="mb-4">
+                                <h3 id="scatterChartTitle" class="text-base font-bold text-slate-800">차량 투입 효율 (가구/대)</h3>
+                                <p class="text-[10px] text-slate-400 mt-1.5 font-medium">🔴 과투입(<35) / 🟢 적정 / 🟡 과소투입(>50)</p>
+                            </div>
+                            <div class="h-[240px] w-full"><canvas id="scatterChart"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="mb-4">
+                                <h3 class="text-base font-bold text-slate-800">회차별 가구수 공급 구조</h3>
+                                <p class="text-[10px] text-slate-400 mt-1.5 font-medium">1차 vs 3차 배송 비중</p>
+                            </div>
+                            <div class="h-[240px] w-full"><canvas id="roundChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                    <div class="border-b border-slate-100 pb-4 mb-5 flex justify-between items-center">
+                        <h3 class="text-base font-bold text-slate-800">✍️ 데이터 입력/수정</h3>
+                        <button onclick="resetForm()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded font-bold transition">입력 초기화</button>
+                    </div>
+                    
+                    <input type="hidden" id="form-mode" value="insert">
+
+                    <div id="dataFormContainer" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">운영 일자 (수정 시 해당 날짜 선택)</label>
+                                <input type="date" id="i-date" class="w-full border border-slate-200 bg-slate-50 p-2.5 rounded-lg text-sm font-bold text-blue-700">
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">총 출고 물동량 (BOX)</label>
+                                <input type="number" id="i-box" class="w-full border border-blue-200 bg-blue-50 p-2.5 rounded-lg text-sm font-bold text-slate-800" placeholder="0">
+                            </div>
+                            
+                            <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-slate-500">🚚 마스터 배차</span></div>
+                            <div><input type="number" id="i-owned" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="지입 정규"></div>
+                            <div><input type="number" id="i-hired" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="스팟 용차"></div>
+
+                            <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-indigo-500">🔄 1차 라우팅</span></div>
+                            <div><input type="number" id="i-r1-house" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="가구수"></div>
+                            <div><input type="number" id="i-r1-veh" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="배차 대수"></div>
+                            <div class="col-span-2"><input type="number" id="i-r1-sin" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="단회 운행 차량수"></div>
+
+                            <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-cyan-500">🔄 3차 라우팅</span></div>
+                            <div><input type="number" id="i-r3-house" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="가구수"></div>
+                            <div><input type="number" id="i-r3-veh" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="배차 대수"></div>
+                            <div class="col-span-2"><input type="number" id="i-r3-sin" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs placeholder-slate-400 text-slate-800" placeholder="단회 운행 차량수"></div>
+
+                            <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-slate-500">⏰ 접안 및 품질</span></div>
+                            <div><label class="block text-[9px] text-slate-500 mb-1">간선막차</label><input type="time" id="i-time-trunk" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800"></div>
+                            <div><label class="block text-[9px] text-slate-500 mb-1">최종출차</label><input type="time" id="i-time-depart" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800"></div>
+                            <div class="col-span-2">
+                                <label class="block text-[10px] font-bold text-slate-500 mb-1">지연배송율 (%)</label>
+                                <input type="number" step="0.01" id="i-delay" class="w-full border border-rose-200 bg-rose-50 p-2 rounded-lg text-sm font-bold text-rose-600" placeholder="0.00">
+                            </div>
+                        </div>
+                        
+                        <button type="button" id="btn-save" onclick="saveDataToGoogle()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition mt-2 shadow-lg shadow-slate-900/20 text-sm">
+                            신규 데이터 저장
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm mt-6">
-            <div class="flex justify-between items-center mb-5">
-                <h3 id="tableTitleMain" class="text-base font-bold text-slate-800">📋 운영 상세 기록 대장</h3>
-                <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">DB 연동 활성화</span>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-6">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 id="tableTitleMain" class="text-base font-bold text-slate-800">📋 운영 상세 기록 대장</h3>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-100 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> 실시간 DB 연동
+                        </span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-center border-collapse whitespace-nowrap min-w-[1400px]" id="mainTable">
+                        </table>
+                </div>
             </div>
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
-                <table class="w-full text-center border-collapse whitespace-nowrap min-w-[1300px]" id="mainTable">
-                    </table>
-            </div>
-        </div>
 
-    </div>
-
-    <div id="dataModal" class="fixed inset-0 bg-slate-900/60 hidden flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white p-7 rounded-2xl shadow-2xl w-full max-w-2xl mx-4">
-            <h2 class="text-xl font-bold text-slate-800 mb-2">텍스트 백업/복원 (보안망 전용)</h2>
-            <p class="text-xs font-medium text-slate-500 mb-5">파일 업로드 차단 환경 시 데이터를 텍스트로 주고받습니다.</p>
-            <textarea id="dataTextarea" class="w-full h-48 border border-slate-300 rounded-xl p-4 text-xs font-mono text-slate-600 focus:outline-none focus:border-blue-500 bg-slate-50" placeholder="텍스트를 복사하거나 붙여넣으세요..."></textarea>
-            <div class="flex gap-3 mt-5">
-                <button onclick="copyDataText()" class="flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold py-3 rounded-xl transition text-sm">복사하기</button>
-                <button onclick="applyDataText()" class="flex-1 bg-blue-600 text-white hover:bg-blue-700 font-bold py-3 rounded-xl transition shadow text-sm">복원하기</button>
-            </div>
-            <button onclick="closeDataModal()" class="w-full mt-3 text-slate-400 hover:text-slate-600 text-sm font-bold py-2">닫기</button>
-        </div>
-    </div>
+        </div> </main>
 
     <div id="loadingModal" class="fixed inset-0 bg-slate-900/40 hidden flex items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center">
+        <div class="bg-white p-8 rounded-2xl shadow-xl flex flex-col items-center">
             <div class="loader mb-4"></div>
-            <p class="text-sm font-bold text-slate-700">DB 동기화 중...</p>
+            <p class="text-sm font-bold text-slate-800">서버 통신 중...</p>
+            <p class="text-[10px] text-slate-500 mt-2">데이터를 동기화하고 있습니다</p>
         </div>
     </div>
 
@@ -235,69 +262,17 @@
         let db = []; 
         let currentViewData = []; 
         let chartInstance1, chartInstance2, chartInstance3;
+        
+        // Navigation State
+        let currentNav = 'YEARLY'; // YEARLY, MONTHLY, DAILY
+        let currentSubNav = 'WEEK'; // WEEK, DAY
 
-        // Chart.js Global Defaults
+        // Chart.js Light Theme Defaults
         Chart.defaults.font.family = "'Inter', 'Pretendard', sans-serif";
-        Chart.defaults.color = '#64748b';
-        const commonGrid = { color: '#f1f5f9', drawBorder: false, borderDash: [4, 4] };
+        Chart.defaults.color = '#64748b'; // slate-500
+        const commonGrid = { color: '#f1f5f9', drawBorder: false, borderDash: [4, 4] }; // slate-100
 
-        function getMonthlyWeekName(dateStr) {
-            const d = new Date(dateStr);
-            if (isNaN(d)) return { month: 0, week: 0, sunday: new Date(), thursday: new Date() };
-            
-            const sunday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
-            const thursday = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate() + 4);
-            const targetMonth = thursday.getMonth() + 1;
-            const weekNum = Math.floor((thursday.getDate() - 1) / 7) + 1;
-            return { month: targetMonth, week: weekNum, sunday: sunday, thursday: thursday };
-        }
-
-        // 1월~12월 주차별 드롭다운 자동 생성
-        function generateWeekOptions() {
-            const select = document.getElementById('monthFilter');
-            let html = `
-                <option value="MONTHLY">📊 연간 누적 (월별 요약)</option>
-                <option value="WEEKLY">📊 연간 누적 (주별 요약)</option>
-                <option disabled>────────────────────</option>
-                <optgroup label="월별 일자 상세">
-            `;
-            
-            for(let m=1; m<=12; m++) {
-                const mStr = String(m).padStart(2, '0');
-                html += `<option value="${mStr}">📅 ${m}월 전체 (일별 상세)</option>`;
-            }
-            
-            html += `
-                </optgroup>
-                <option disabled>────────────────────</option>
-                <optgroup label="주차별 상세 (일~토 연속, 월별명칭 적용)">
-            `;
-            
-            let d = new Date(2026, 0, 1);
-            d = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
-            
-            while(d.getFullYear() <= 2026) {
-                let thurs = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 4);
-                if(thurs.getFullYear() > 2026) break; 
-                
-                let m = thurs.getMonth() + 1;
-                let w = Math.floor((thurs.getDate() - 1) / 7) + 1;
-                
-                let start = new Date(d);
-                let end = new Date(d);
-                end.setDate(end.getDate() + 6);
-                
-                let startStr = `${start.getMonth()+1}.${start.getDate()}`;
-                let endStr = `${end.getMonth()+1}.${end.getDate()}`;
-                
-                html += `<option value="MW-${m}-${w}">🗓️ ${m}월 ${w}주차 (${startStr} ~ ${endStr})</option>`;
-                
-                d.setDate(d.getDate() + 7);
-            }
-            html += `</optgroup>`;
-            select.innerHTML = html;
-        }
-
+        // --- Helper Functions ---
         function safeNum(val) {
             if (!val) return 0;
             if (typeof val === 'number') return val;
@@ -309,6 +284,7 @@
             let [h, m] = t.split(':').map(Number);
             return h * 60 + m;
         }
+        
         function minsToTime(m) {
             if(m === null || isNaN(m)) return '-';
             let h = Math.floor(m / 60) % 24;
@@ -316,47 +292,131 @@
             return String(h).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
         }
 
-        async function fetchDataFromGoogle() {
-            if (SCRIPT_URL.includes("여기에_복사한_URL_주소를_넣어주세요")) {
-                alert("SCRIPT_URL 주소가 기본값입니다. 구글 배포 URL을 코드에 입력해주세요!");
-                return;
-            }
-            
-            showLoading(true);
-            let fetchedData = null;
-            
-            try {
-                const res = await fetch(SCRIPT_URL);
-                const text = await res.text();
-                if(text.includes("<!DOCTYPE html>")) {
-                    alert("구글 Apps Script 권한 오류 발생! 배포 시 접속 권한을 '모든 사용자'로 설정했는지 확인하세요.");
-                    showLoading(false);
-                    return;
-                }
-                fetchedData = JSON.parse(text);
-            } catch (e) {
-                alert("구글 서버와 통신할 수 없습니다.\n\n원인: " + e.message);
-                showLoading(false);
-                return;
-            }
+        function getMonthlyWeekName(dateStr) {
+            const d = new Date(dateStr);
+            if (isNaN(d)) return { month: 0, week: 0, sunday: new Date(), thursday: new Date() };
+            const sunday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay());
+            const thursday = new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate() + 4);
+            return { month: thursday.getMonth() + 1, week: Math.floor((thursday.getDate() - 1) / 7) + 1, sunday, thursday };
+        }
 
+        function safeUpdateText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = text; // Allow HTML rendering for formatCell
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingModal').style.display = show ? 'flex' : 'none';
+        }
+
+        // --- Navigation Logic ---
+        function setNavView(view) {
+            currentNav = view;
+            
+            // UI Update
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${view}`).classList.add('active');
+            
+            const monthSelector = document.getElementById('monthSelector');
+            const dailyToggleGroup = document.getElementById('dailyToggleGroup');
+            const viewTitle = document.getElementById('currentViewTitle');
+
+            monthSelector.classList.add('hidden');
+            dailyToggleGroup.classList.add('hidden');
+
+            if (view === 'YEARLY') {
+                viewTitle.innerText = '연간 KPI 요약';
+            } else if (view === 'MONTHLY') {
+                viewTitle.innerText = '월별 KPI 현황';
+                monthSelector.classList.remove('hidden');
+                const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+                if(!monthSelector.value) monthSelector.value = currentMonth;
+            } else if (view === 'DAILY') {
+                viewTitle.innerText = '일별 상세 대장';
+                dailyToggleGroup.classList.remove('hidden');
+                setSubView(currentSubNav); 
+            }
+            
+            updateDashboard();
+        }
+
+        function setSubView(subView) {
+            currentSubNav = subView;
+            document.getElementById('subnav-WEEK').className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition";
+            document.getElementById('subnav-DAY').className = "px-3 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-900 transition";
+            
+            document.getElementById(`subnav-${subView}`).className = "px-3 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white transition shadow-sm";
+            
+            if(currentNav === 'DAILY') updateDashboard();
+        }
+
+        // --- CRUD Logic ---
+        function resetForm() {
+            document.getElementById('form-mode').value = 'insert';
+            document.getElementById('btn-save').innerText = '신규 데이터 저장';
+            document.getElementById('btn-save').className = "w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition mt-2 shadow-lg shadow-slate-900/20 text-sm";
+            document.getElementById('i-date').readOnly = false;
+            document.querySelectorAll('#dataFormContainer input:not(#i-date)').forEach(i => i.value = '');
+        }
+
+        function editRecord(dateStr) {
+            const record = db.find(d => d.date === dateStr);
+            if(!record) return alert("데이터를 찾을 수 없습니다.");
+            
+            document.getElementById('form-mode').value = 'update';
+            document.getElementById('i-date').value = record.date;
+            document.getElementById('i-date').readOnly = true; 
+            
+            document.getElementById('i-box').value = record.box;
+            document.getElementById('i-owned').value = record.owned;
+            document.getElementById('i-hired').value = record.hired;
+            document.getElementById('i-r1-house').value = record.r1House;
+            document.getElementById('i-r1-veh').value = record.r1Veh;
+            document.getElementById('i-r1-sin').value = record.r1Sin;
+            document.getElementById('i-r3-house').value = record.r3House;
+            document.getElementById('i-r3-veh').value = record.r3Veh;
+            document.getElementById('i-r3-sin').value = record.r3Sin;
+            document.getElementById('i-time-trunk').value = record.timeTrunk !== '-' ? record.timeTrunk : '';
+            document.getElementById('i-time-depart').value = record.timeDepart !== '-' ? record.timeDepart : '';
+            document.getElementById('i-delay').value = record.delay;
+            
+            document.getElementById('btn-save').innerText = '데이터 수정 업데이트';
+            document.getElementById('btn-save').className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition mt-2 shadow-lg shadow-emerald-900/30 text-sm";
+            
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        async function deleteRecord(dateStr) {
+            if(!confirm(`정말 ${dateStr} 일자 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+            
+            db = db.filter(d => d.date !== dateStr);
+            updateDashboard();
+
+            showLoading(true);
             try {
-                db = fetchedData;
-                updateDashboard();
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: 'delete', date: dateStr }) 
+                });
+                alert('✅ 삭제되었습니다.');
             } catch (e) {
-                console.error("대시보드 렌더링 에러 상세:", e);
-                alert("데이터는 정상적으로 불러왔으나 화면을 그리는 중 오류가 발생했습니다.\n\n오류 내용: " + e.message);
+                alert("서버 삭제 중 오류 발생. 새로고침 시 복구될 수 있습니다.");
             } finally {
                 showLoading(false);
             }
         }
 
         async function saveDataToGoogle() {
+            if (SCRIPT_URL.includes("여기에_복사한_URL_주소를_넣어주세요")) return alert("URL이 설정되지 않았습니다.");
+            
+            const mode = document.getElementById('form-mode').value;
             const inputDate = document.getElementById('i-date').value;
             const inputBox = document.getElementById('i-box').value;
-            if (!inputDate || !inputBox) return alert("운영 일자와 총 출고 물동량은 필수입니다.");
+            
+            if (!inputDate || !inputBox) return alert("운영 일자와 총 물동량은 필수입니다.");
 
-            const newRecord = {
+            const record = {
+                action: mode,
                 date: inputDate, box: Number(inputBox),
                 owned: Number(document.getElementById('i-owned').value) || 0,
                 hired: Number(document.getElementById('i-hired').value) || 0,
@@ -371,54 +431,72 @@
                 delay: Number(document.getElementById('i-delay').value) || 0
             };
 
+            if (mode === 'insert') {
+                if(db.find(d => d.date === inputDate)) return alert("해당 일자는 이미 존재합니다. 표에서 '수정'을 눌러주세요.");
+                db.push(record);
+            } else {
+                const idx = db.findIndex(d => d.date === inputDate);
+                if(idx !== -1) db[idx] = record;
+            }
+            updateDashboard();
+            resetForm();
+
             showLoading(true);
             try {
-                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(newRecord) });
-                document.querySelectorAll('#dataFormContainer input:not(#i-date)').forEach(i => i.value = '');
-                alert('✅ 정상적으로 구글 시트에 데이터가 입력되었습니다!');
-                await fetchDataFromGoogle(); 
+                const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(record) });
+                const resJson = await res.json();
+                if(resJson.status === 'error') {
+                    alert('서버 에러: ' + resJson.message);
+                    fetchDataFromGoogle(); // rollback
+                }
             } catch (e) { 
-                alert("데이터 전송 실패!\n\n" + e.message); 
+                alert("네트워크 오류! 재동기화 합니다.");
+                fetchDataFromGoogle();
+            } finally { 
+                showLoading(false); 
+            }
+        }
+
+        async function fetchDataFromGoogle() {
+            if (SCRIPT_URL.includes("여기에_복사한_URL_주소를_넣어주세요")) return;
+            showLoading(true);
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const text = await res.text();
+                if(text.includes("<!DOCTYPE html>")) {
+                    alert("구글 Apps Script 권한 오류 발생!"); return;
+                }
+                db = JSON.parse(text);
+                updateDashboard();
+            } catch (e) {
+                console.error(e);
+                alert("DB 통신 실패");
+            } finally {
                 showLoading(false);
             }
         }
 
-        function showLoading(show) {
-            document.getElementById('loadingModal').style.display = show ? 'flex' : 'none';
-        }
-
-        // 안전한 DOM 업데이트 함수
-        function safeUpdateText(id, text) {
-            const el = document.getElementById(id);
-            if (el) el.innerText = text;
-        }
-
+        // --- Core Dashboard Update ---
         function updateDashboard() {
-            const filter = document.getElementById('monthFilter')?.value || 'ALL';
-            const isSummary = (filter === 'MONTHLY' || filter === 'WEEKLY');
-            
             db.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
 
-            // 데이터 필터링 로직
+            // Filtering based on Nav State
             let filteredDB = [];
-            if (!isSummary) {
-                if(filter.startsWith('MW-')) { 
-                    const parts = filter.split('-');
-                    const selM = parseInt(parts[1]);
-                    const selW = parseInt(parts[2]);
-                    filteredDB = db.filter(d => {
-                        if(!d.date) return false;
-                        const info = getMonthlyWeekName(d.date);
-                        return info.month === selM && info.week === selW;
-                    });
-                } else { 
-                    filteredDB = db.filter(d => d.date && d.date.substring(5, 7) === filter);
-                }
-            } else {
+            let isAggregated = false;
+
+            if (currentNav === 'YEARLY') {
+                filteredDB = db.filter(d => d.date && d.date.length > 5); 
+                isAggregated = true;
+            } else if (currentNav === 'MONTHLY') {
+                const selM = document.getElementById('monthSelector').value;
+                filteredDB = db.filter(d => d.date && d.date.substring(5, 7) === selM);
+                isAggregated = false; 
+            } else if (currentNav === 'DAILY') {
                 filteredDB = db.filter(d => d.date && d.date.length > 5);
+                isAggregated = (currentSubNav === 'WEEK');
             }
 
-            // 상단 KPI 카드 계산
+            // Top KPI Calculation
             let tBox = 0, tHouse = 0, tVeh = 0, tHired = 0, tDelaySum = 0, tR1Sin = 0, tR3Sin = 0, tR1Veh = 0, tR3Veh = 0;
             filteredDB.forEach(r => {
                 tBox += safeNum(r.box);
@@ -439,7 +517,6 @@
             const avgHired = tVeh === 0 ? 0 : ((tHired / tVeh) * 100).toFixed(1);
             const avgDelay = filteredDB.length === 0 ? 0 : (tDelaySum / rCount).toFixed(2);
             const dropSizeOverall = tHouse === 0 ? 0 : (tBox / tHouse).toFixed(2);
-            
             const totalRoundVeh = (tR1Veh + tR3Veh);
             const singleRatio = totalRoundVeh === 0 ? 0 : (((tR1Sin + tR3Sin) / totalRoundVeh) * 100).toFixed(1);
             const successRate = (100 - avgDelay).toFixed(2);
@@ -452,396 +529,259 @@
             safeUpdateText('kpi-hired', avgHired + '%');
             safeUpdateText('kpi-single', singleRatio + '%');
             safeUpdateText('kpi-delay', avgDelay + '%');
-            safeUpdateText('kpi-success', `성공: ${successRate}%`);
+            
+            const kpiSuccess = document.getElementById('kpi-success');
+            if(kpiSuccess) kpiSuccess.innerText = `성공: ${successRate}%`;
 
             const elDelay = document.getElementById('kpi-delay');
             if(elDelay) {
                 if(Number(avgDelay) > 3) elDelay.className = "text-2xl xl:text-3xl font-black text-rose-600 mt-1 truncate tracking-tight";
                 else if (Number(avgDelay) > 1) elDelay.className = "text-2xl xl:text-3xl font-black text-amber-500 mt-1 truncate tracking-tight";
-                else elDelay.className = "text-2xl xl:text-3xl font-black text-emerald-600 mt-1 truncate tracking-tight";
+                else elDelay.className = "text-2xl xl:text-3xl font-black text-slate-800 mt-1 truncate tracking-tight"; // Default dark
             }
 
-            // 뷰 데이터 구성
+            // View Data Preparation
             let viewData = [];
-            if (isSummary) {
+            if (currentNav === 'YEARLY') {
                 const grouped = {};
                 filteredDB.forEach(r => {
-                    let key, label;
-                    if (filter === 'MONTHLY') {
-                        key = r.date.substring(0, 7);
-                        const parts = key.split('-');
-                        label = parts.length === 2 ? parseInt(parts[1]) + '월' : key;
-                    } else { 
-                        const info = getMonthlyWeekName(r.date);
-                        key = 'MW-' + String(info.month).padStart(2, '0') + '-' + String(info.week).padStart(2, '0');
-                        let start = info.sunday;
-                        let end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
-                        label = `${info.month}월 ${info.week}주차 (${start.getMonth()+1}.${start.getDate()}~${end.getMonth()+1}.${end.getDate()})`;
-                    }
-
-                    if(!grouped[key]) {
-                        grouped[key] = { 
-                            key: key, label: label, date: r.date, count: 0, box: 0, owned: 0, hired: 0, 
-                            r1House: 0, r1Veh: 0, r1Sin: 0, r3House: 0, r3Veh: 0, r3Sin: 0, 
-                            delaySum: 0, timeTrunkMins: 0, timeDepartMins: 0, trunkCount: 0, departCount: 0 
-                        };
-                    }
-                    grouped[key].count++;
-                    grouped[key].box += safeNum(r.box);
-                    grouped[key].owned += safeNum(r.owned);
-                    grouped[key].hired += safeNum(r.hired);
-                    grouped[key].r1House += safeNum(r.r1House);
-                    grouped[key].r1Veh += safeNum(r.r1Veh);
-                    grouped[key].r1Sin += safeNum(r.r1Sin);
-                    grouped[key].r3House += safeNum(r.r3House);
-                    grouped[key].r3Veh += safeNum(r.r3Veh);
-                    grouped[key].r3Sin += safeNum(r.r3Sin);
-                    grouped[key].delaySum += safeNum(r.delay);
+                    let key = r.date.substring(0, 7);
+                    let label = parseInt(key.substring(5)) + '월';
+                    if(!grouped[key]) initGroup(grouped, key, label, r.date);
+                    addRecordToGroup(grouped[key], r);
+                });
+                viewData = Object.values(grouped).sort((a,b) => a.key.localeCompare(b.key));
+            } else if (currentNav === 'DAILY' && currentSubNav === 'WEEK') {
+                const grouped = {};
+                filteredDB.forEach(r => {
+                    const info = getMonthlyWeekName(r.date);
+                    let key = 'MW-' + String(info.month).padStart(2, '0') + '-' + String(info.week).padStart(2, '0');
+                    let start = info.sunday;
+                    let end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+                    let label = `${info.month}월 ${info.week}주 (${start.getMonth()+1}.${start.getDate()})`;
                     
-                    const trunkMins = timeToMins(r.timeTrunk);
-                    if(trunkMins !== null) { grouped[key].timeTrunkMins += trunkMins; grouped[key].trunkCount++; }
-                    const departMins = timeToMins(r.timeDepart);
-                    if(departMins !== null) { grouped[key].timeDepartMins += departMins; grouped[key].departCount++; }
+                    if(!grouped[key]) initGroup(grouped, key, label, r.date);
+                    addRecordToGroup(grouped[key], r);
                 });
                 viewData = Object.values(grouped).sort((a,b) => a.key.localeCompare(b.key));
             } else {
                 viewData = [...filteredDB];
             }
-            currentViewData = viewData; 
+            currentViewData = viewData;
 
-            // 차트 라벨 세팅
-            safeUpdateText('trendChartTitle', isSummary ? "기간별 물동량 및 차량당 생산성 추이" : "일별 물동량 및 차량당 생산성 추이");
-            safeUpdateText('scatterChartTitle', isSummary ? "기간별 차량 투입 효율 추이" : "일자별 차량 투입 효율 추이");
+            // Chart Rendering
+            const chartLabels = viewData.map(d => isAggregated ? d.label : parseInt(d.date.substring(8)) + '일');
             
-            const trendCanvas = document.getElementById('trendChart');
-            if(trendCanvas) {
-                const ctx1 = trendCanvas.getContext('2d');
-                const gradBlue = ctx1.createLinearGradient(0, 0, 0, 300);
-                gradBlue.addColorStop(0, 'rgba(59, 130, 246, 0.9)');
-                gradBlue.addColorStop(1, 'rgba(59, 130, 246, 0.3)');
+            const ctx1 = document.getElementById('trendChart').getContext('2d');
+            const gradBlue = ctx1.createLinearGradient(0, 0, 0, 300);
+            gradBlue.addColorStop(0, 'rgba(59, 130, 246, 0.9)'); 
+            gradBlue.addColorStop(1, 'rgba(59, 130, 246, 0.2)');
 
-                const chartLabels = viewData.map(d => {
-                    if (isSummary) return d.label;
-                    if (!d.date) return '알수없음';
-                    const parts = d.date.split('-');
-                    return parts.length === 3 ? parseInt(parts[2]) + '일' : d.date;
-                });
+            if(chartInstance1) chartInstance1.destroy();
+            chartInstance1 = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        { label: '물동량(BOX)', data: viewData.map(d=>safeNum(d.box)), backgroundColor: gradBlue, borderRadius: 4, barPercentage: 0.5, order: 2 },
+                        { label: '차량당 캐파', data: viewData.map(d=>(safeNum(d.box)/(safeNum(d.owned)+safeNum(d.hired)||1)).toFixed(1)), type: 'line', borderColor: '#4f46e5', borderWidth: 2, pointBackgroundColor: '#ffffff', pointBorderWidth: 2, tension: 0.4, yAxisID: 'y1', order: 1 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { display: false }, y1: { position: 'right', grid: commonGrid } }, plugins: { legend: { display: false } } }
+            });
 
-                if(chartInstance1) chartInstance1.destroy();
-                chartInstance1 = new Chart(ctx1, {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [
-                            { label: '물동량(BOX)', data: viewData.map(d=>safeNum(d.box)), backgroundColor: gradBlue, borderRadius: 6, barPercentage: 0.6, order: 2 },
-                            { label: '차량당 캐파', data: viewData.map(d=>(safeNum(d.box)/(safeNum(d.owned)+safeNum(d.hired)||1)).toFixed(1)), type: 'line', borderColor: '#4f46e5', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 4, tension: 0.4, yAxisID: 'y1', order: 1 }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { display: false }, y1: { position: 'right', grid: commonGrid } }, plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 8, titleFont: { size: 14 } } } }
-                });
+            if(chartInstance2) chartInstance2.destroy();
+            const effColors = viewData.map(d => {
+                const v = safeNum(d.owned) + safeNum(d.hired);
+                const h = safeNum(d.r1House) + safeNum(d.r3House);
+                const eff = v === 0 ? 0 : h / v; 
+                return eff < 35 ? '#ef4444' : (eff > 50 ? '#f59e0b' : '#10b981'); 
+            });
+            chartInstance2 = new Chart(document.getElementById('scatterChart'), {
+                type: 'line',
+                data: { 
+                    labels: chartLabels,
+                    datasets: [{ 
+                        label: '효율', data: viewData.map(d=>{
+                            const v = safeNum(d.owned) + safeNum(d.hired);
+                            return v===0?0: parseFloat(((safeNum(d.r1House)+safeNum(d.r3House))/v).toFixed(1));
+                        }), 
+                        borderColor: '#cbd5e1', borderWidth: 1, backgroundColor: effColors,
+                        pointBorderColor: '#ffffff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3
+                    }] 
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: commonGrid } } }
+            });
 
-                if(chartInstance2) chartInstance2.destroy();
-                const efficiencyData = viewData.map(d => {
-                    const v = safeNum(d.owned) + safeNum(d.hired);
-                    const h = safeNum(d.r1House) + safeNum(d.r3House);
-                    return v === 0 ? 0 : parseFloat((h / v).toFixed(1)); 
-                });
-                const effColors = viewData.map(d => {
-                    const v = safeNum(d.owned) + safeNum(d.hired);
-                    const h = safeNum(d.r1House) + safeNum(d.r3House);
-                    const eff = v === 0 ? 0 : h / v; 
-                    if (eff < 35) return '#ef4444'; 
-                    if (eff > 50) return '#f59e0b'; 
-                    return '#10b981'; 
-                });
+            if(chartInstance3) chartInstance3.destroy();
+            chartInstance3 = new Chart(document.getElementById('roundChart'), {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        { label: '1차 가구', data: viewData.map(d=>safeNum(d.r1House)), backgroundColor: '#cbd5e1', borderRadius: 2 },
+                        { label: '3차 가구', data: viewData.map(d=>safeNum(d.r3House)), backgroundColor: '#818cf8', borderRadius: 2 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: commonGrid } }, plugins: { legend: { display: false } } }
+            });
 
-                chartInstance2 = new Chart(document.getElementById('scatterChart'), {
-                    type: 'line',
-                    data: { 
-                        labels: chartLabels,
-                        datasets: [{ 
-                            label: '투입 효율 (가구/대)', data: efficiencyData, borderColor: '#cbd5e1', borderWidth: 2, backgroundColor: effColors,
-                            pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 6, pointHoverRadius: 8, tension: 0.4
-                        }] 
-                    },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false, 
-                        plugins: { 
-                            legend: { display: false },
-                            tooltip: { 
-                                padding: 12, cornerRadius: 8,
-                                callbacks: { 
-                                    label: (c) => {
-                                        const d = viewData[c.dataIndex];
-                                        const v = safeNum(d.owned) + safeNum(d.hired);
-                                        const h = safeNum(d.r1House) + safeNum(d.r3House);
-                                        return [`⚡ 효율: ${c.raw} 가구/대`, `🏠 배송가구: ${h.toLocaleString()}가구`, `🚚 투입차량: ${v}대`]; 
-                                    } 
-                                } 
-                            } 
-                        }, 
-                        scales: { x: { grid: { display: false } }, y: { grid: commonGrid, title: {display: true, text: '배송 효율 (가구/대)'} } }
-                    }
-                });
-
-                if(chartInstance3) chartInstance3.destroy();
-                chartInstance3 = new Chart(document.getElementById('roundChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: [
-                            { label: '1회차 가구', data: viewData.map(d=>safeNum(d.r1House)), backgroundColor: '#cbd5e1', borderRadius: 4, barPercentage: 0.6 },
-                            { label: '3회차 가구', data: viewData.map(d=>safeNum(d.r3House)), backgroundColor: '#818cf8', borderRadius: 4, barPercentage: 0.6 }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: commonGrid } }, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } }, tooltip: { padding: 12, cornerRadius: 8 } } }
-                });
-            }
-
-            // 테이블 렌더링 로직
+            // Table Rendering
             const mainTable = document.getElementById('mainTable');
             if(!mainTable) return;
-
-            let theadMain = '';
             
-            if (isSummary) {
-                let titleStr = filter === 'MONTHLY' ? '월별' : '주별';
-                safeUpdateText('tableTitleMain', `📋 ${titleStr} 통합 운영 기록 대장 (총계 및 일평균)`);
-                
-                theadMain = `
-                    <thead><tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 text-[11px] uppercase tracking-wider">
-                        <th class="p-3.5 text-left">기간</th>
-                        <th class="p-3.5 text-slate-800">물동량 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        <th class="p-3.5">가구수 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        
-                        <th class="p-3.5 border-l border-slate-200">총대수 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        <th class="p-3.5 bg-slate-50/50">지입 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        <th class="p-3.5 bg-slate-50/50 border-r border-slate-200 text-amber-600">용차 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        
-                        <th class="p-3.5 text-blue-600">생산성 <span class="text-[9px] font-normal block text-blue-400">기간체감평균</span></th>
-                        
-                        <th class="p-3.5 bg-indigo-50/50 border-l border-slate-200">1차 가구 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        <th class="p-3.5 bg-indigo-50/50">1차 배차 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        <th class="p-3.5 bg-indigo-50/50 border-r border-slate-200">1차 단회 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        
-                        <th class="p-3.5 bg-cyan-50/50">3차 가구 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        <th class="p-3.5 bg-cyan-50/50">3차 배차 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        <th class="p-3.5 bg-cyan-50/50 border-r border-slate-200">3차 단회 <span class="text-[9px] font-normal block text-slate-400">총계(일평균)</span></th>
-                        
-                        <th class="p-3.5">평균 간선</th>
-                        <th class="p-3.5">평균 출차</th>
-                        <th class="p-3.5 text-rose-600">평균 지연율</th>
-                        <th class="p-3.5 text-purple-600">점착/BOX <span class="text-[9px] font-normal block text-purple-400">가구당평균</span></th>
-                        <th class="p-3.5 text-emerald-600 text-right">총 매출액(원)</th>
-                    </tr></thead><tbody id="mainTbody" class="divide-y divide-slate-100 text-slate-600 text-xs font-medium"></tbody>`;
-                
-                mainTable.innerHTML = theadMain;
-                const mainTbody = document.getElementById('mainTbody');
+            let tableTitle = '';
+            if (currentNav === 'YEARLY') tableTitle = "월별 요약 대장";
+            else if (currentNav === 'MONTHLY') tableTitle = `${document.getElementById('monthSelector').value}월 일별 상세 기록`;
+            else tableTitle = currentSubNav === 'WEEK' ? "주차별 요약 대장" : "일자별 상세 기록 대장";
+            
+            safeUpdateText('tableTitleMain', `📋 ${tableTitle}`);
 
-                if (viewData.length === 0) {
-                    mainTbody.innerHTML = `<tr><td colspan="18" class="p-8 text-slate-400">데이터가 없습니다.</td></tr>`;
-                    return;
-                }
+            let thead = `
+                <thead><tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 text-[10px] uppercase tracking-wider">
+                    <th class="p-3 text-left w-24">기간/일자</th>
+                    <th class="p-3 text-slate-800">물동량</th>
+                    <th class="p-3">가구수</th>
+                    <th class="p-3 border-l border-slate-200 text-blue-600">총대수</th>
+                    <th class="p-3 bg-slate-100/50">지입</th>
+                    <th class="p-3 bg-slate-100/50 border-r border-slate-200 text-amber-600">용차</th>
+                    <th class="p-3 text-cyan-600">생산성</th>
+                    <th class="p-3 bg-slate-50/50 border-l border-slate-200">1차(가/차/단)</th>
+                    <th class="p-3 bg-slate-50/50 border-r border-slate-200">3차(가/차/단)</th>
+                    <th class="p-3">지연율</th>
+                    <th class="p-3 text-purple-600">점착/BOX</th>
+                    <th class="p-3 text-emerald-600 text-right">매출액(원)</th>
+                    ${!isAggregated ? '<th class="p-3 text-center">관리</th>' : ''}
+                </tr></thead><tbody id="mainTbody" class="divide-y divide-slate-100 text-slate-600 text-xs font-medium"></tbody>`;
+            
+            mainTable.innerHTML = thead;
+            const mainTbody = document.getElementById('mainTbody');
 
-                const formatCell = (sum, avg) => `${sum.toLocaleString()}<br><span class="text-[10px] text-slate-400 font-normal">평균 ${avg.toLocaleString()}</span>`;
-
-                viewData.forEach(r => {
-                    const cv = r.owned + r.hired;
-                    const ch = r.r1House + r.r3House;
-                    const count = r.count || 1;
-
-                    const avgBox = Math.round(r.box / count);
-                    const avgCv = Math.round(cv / count);
-                    const avgOwned = Math.round(r.owned / count);
-                    const avgHired = Math.round(r.hired / count);
-                    const avgHouse = Math.round(ch / count);
-                    
-                    const avgCp = avgCv === 0 ? 0 : (r.box / cv).toFixed(1); 
-                    
-                    const avgR1H = Math.round(r.r1House / count);
-                    const avgR1V = (r.r1Veh / count).toFixed(1);
-                    const avgR1S = (r.r1Sin / count).toFixed(1);
-                    const avgR3H = Math.round(r.r3House / count);
-                    const avgR3V = (r.r3Veh / count).toFixed(1);
-                    const avgR3S = (r.r3Sin / count).toFixed(1);
-                    
-                    const avgTrunk = r.trunkCount > 0 ? minsToTime(r.timeTrunkMins / r.trunkCount) : '-';
-                    const avgDepart = r.departCount > 0 ? minsToTime(r.timeDepartMins / r.departCount) : '-';
-                    const avgDelay = (r.delaySum / count).toFixed(2);
-                    const avgDropSize = ch === 0 ? 0 : (r.box / ch).toFixed(2);
-                    
-                    let delayClass = "text-emerald-600 bg-emerald-50";
-                    if(avgDelay > 3) delayClass = "text-rose-600 font-bold bg-rose-50 border border-rose-100";
-                    else if(avgDelay > 1) delayClass = "text-amber-600 font-bold bg-amber-50 border border-amber-100";
-
-                    mainTbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                            <td class="p-3.5 text-left font-bold text-slate-700">${r.label}</td>
-                            <td class="p-3.5 font-black text-slate-900 leading-tight">${formatCell(r.box, avgBox)}</td>
-                            <td class="p-3.5 font-bold leading-tight">${formatCell(ch, avgHouse)}</td>
-                            
-                            <td class="p-3.5 text-slate-700 leading-tight font-bold border-l border-slate-200">${formatCell(cv, avgCv)}</td>
-                            <td class="p-3.5 text-slate-600 leading-tight bg-slate-50/50">${formatCell(r.owned, avgOwned)}</td>
-                            <td class="p-3.5 text-amber-600 leading-tight bg-slate-50/50 border-r border-slate-200">${formatCell(r.hired, avgHired)}</td>
-                            
-                            <td class="p-3.5 font-extrabold text-blue-600 bg-blue-50/50 align-middle">${avgCp}</td>
-                            
-                            <td class="p-3.5 bg-indigo-50/50 border-l border-slate-200 leading-tight">${formatCell(r.r1House, avgR1H)}</td>
-                            <td class="p-3.5 bg-indigo-50/50 leading-tight">${formatCell(r.r1Veh, avgR1V)}</td>
-                            <td class="p-3.5 bg-indigo-50/50 border-r border-slate-200 text-indigo-400 leading-tight">${formatCell(r.r1Sin, avgR1S)}</td>
-                            
-                            <td class="p-3.5 bg-cyan-50/50 leading-tight">${formatCell(r.r3House, avgR3H)}</td>
-                            <td class="p-3.5 bg-cyan-50/50 leading-tight">${formatCell(r.r3Veh, avgR3V)}</td>
-                            <td class="p-3.5 bg-cyan-50/50 border-r border-slate-200 text-cyan-500 leading-tight">${formatCell(r.r3Sin, avgR3S)}</td>
-                            
-                            <td class="p-3.5 text-slate-500 align-middle">${avgTrunk}</td>
-                            <td class="p-3.5 text-slate-500 align-middle">${avgDepart}</td>
-                            <td class="p-3.5 align-middle"><span class="px-2 py-0.5 rounded-md ${delayClass}">${avgDelay}%</span></td>
-                            <td class="p-3.5 font-bold text-purple-600 align-middle">${avgDropSize}</td>
-                            <td class="p-3.5 font-bold text-emerald-600 text-right align-middle">${(r.box * UNIT_REVENUE).toLocaleString()}</td>
-                        </tr>
-                    `;
-                });
-                
-            } else {
-                let subTitle = filter.startsWith('MW') ? '주차별 일자 상세' : '월별 일자 상세';
-                safeUpdateText('tableTitleMain', `📋 ${subTitle} 운영 기록 대장`);
-                
-                theadMain = `
-                    <thead><tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 text-[11px] uppercase tracking-wider">
-                        <th class="p-3.5 text-left">일자</th>
-                        <th class="p-3.5 text-slate-800">물동량</th>
-                        <th class="p-3.5">가구수</th>
-                        
-                        <th class="p-3.5 border-l border-slate-200">총대수</th>
-                        <th class="p-3.5 bg-slate-50/50">지입</th>
-                        <th class="p-3.5 bg-slate-50/50 border-r border-slate-200 text-amber-600">용차</th>
-                        
-                        <th class="p-3.5 text-blue-600">생산성(건)</th>
-                        
-                        <th class="p-3.5 bg-indigo-50/50 border-l border-slate-200">1차 가구</th>
-                        <th class="p-3.5 bg-indigo-50/50">1차 배차</th>
-                        <th class="p-3.5 bg-indigo-50/50 border-r border-slate-200">1차 단회</th>
-                        <th class="p-3.5 bg-cyan-50/50">3차 가구</th>
-                        <th class="p-3.5 bg-cyan-50/50">3차 배차</th>
-                        <th class="p-3.5 bg-cyan-50/50 border-r border-slate-200">3차 단회</th>
-                        
-                        <th class="p-3.5">간선막차</th>
-                        <th class="p-3.5">최종출차</th>
-                        <th class="p-3.5 text-rose-600">지연율(%)</th>
-                        <th class="p-3.5 text-purple-600">점착/BOX</th>
-                        <th class="p-3.5 text-emerald-600 text-right">매출액(원)</th>
-                    </tr></thead><tbody id="mainTbody" class="divide-y divide-slate-100 text-slate-600 text-xs font-medium"></tbody>`;
-                
-                mainTable.innerHTML = theadMain;
-                const mainTbody = document.getElementById('mainTbody');
-
-                if (viewData.length === 0) {
-                    mainTbody.innerHTML = `<tr><td colspan="18" class="p-8 text-slate-400">데이터가 없습니다.</td></tr>`;
-                    return;
-                }
-
-                viewData.forEach(r => {
-                    const cv = safeNum(r.owned) + safeNum(r.hired);
-                    const ch = safeNum(r.r1House) + safeNum(r.r3House);
-                    const cp = cv === 0 ? 0 : (safeNum(r.box) / cv).toFixed(1);
-                    const dropSize = ch === 0 ? 0 : (safeNum(r.box) / ch).toFixed(2);
-                    
-                    let delayClass = "text-emerald-600 bg-emerald-50";
-                    if(safeNum(r.delay) > 3) delayClass = "text-rose-600 font-bold bg-rose-50 border border-rose-100";
-                    else if(safeNum(r.delay) > 1) delayClass = "text-amber-600 font-bold bg-amber-50 border border-amber-100";
-
-                    mainTbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                            <td class="p-3.5 text-left font-bold text-slate-700">${r.date || '알수없음'}</td>
-                            <td class="p-3.5 font-black text-slate-900">${safeNum(r.box).toLocaleString()}</td>
-                            <td class="p-3.5 font-bold">${ch.toLocaleString()}</td>
-                            
-                            <td class="p-3.5 text-slate-700 font-bold border-l border-slate-200">${cv}</td>
-                            <td class="p-3.5 text-slate-600 bg-slate-50/50">${safeNum(r.owned)}</td>
-                            <td class="p-3.5 text-amber-600 bg-slate-50/50 border-r border-slate-200">${safeNum(r.hired)}</td>
-                            
-                            <td class="p-3.5 font-extrabold text-blue-600 bg-blue-50/50">${cp}</td>
-                            
-                            <td class="p-3.5 bg-indigo-50/50 border-l border-slate-200">${safeNum(r.r1House).toLocaleString()}</td>
-                            <td class="p-3.5 bg-indigo-50/50">${safeNum(r.r1Veh)}</td>
-                            <td class="p-3.5 bg-indigo-50/50 border-r border-slate-200 text-indigo-400">${safeNum(r.r1Sin)}</td>
-                            
-                            <td class="p-3.5 bg-cyan-50/50">${safeNum(r.r3House).toLocaleString()}</td>
-                            <td class="p-3.5 bg-cyan-50/50">${safeNum(r.r3Veh)}</td>
-                            <td class="p-3.5 bg-cyan-50/50 border-r border-slate-200 text-cyan-500">${safeNum(r.r3Sin)}</td>
-                            
-                            <td class="p-3.5 text-slate-500">${r.timeTrunk || '-'}</td>
-                            <td class="p-3.5 text-slate-500">${r.timeDepart || '-'}</td>
-                            <td class="p-3.5"><span class="px-2 py-0.5 rounded-md ${delayClass}">${safeNum(r.delay)}%</span></td>
-                            <td class="p-3.5 font-bold text-purple-600">${dropSize}</td>
-                            <td class="p-3.5 font-bold text-emerald-600 text-right">${(safeNum(r.box)*UNIT_REVENUE).toLocaleString()}</td>
-                        </tr>
-                    `;
-                });
+            if (viewData.length === 0) {
+                mainTbody.innerHTML = `<tr><td colspan="${isAggregated?12:13}" class="p-8 text-slate-400">데이터가 없습니다.</td></tr>`;
+                return;
             }
+
+            const formatAggr = (s, a) => `${s.toLocaleString()}<br><span class="text-[9px] text-slate-400 font-normal mt-0.5 inline-block">평균 ${a.toLocaleString()}</span>`;
+
+            viewData.forEach(r => {
+                const cv = safeNum(r.owned) + safeNum(r.hired);
+                const ch = safeNum(r.r1House) + safeNum(r.r3House);
+                const count = r.count || 1;
+                
+                let delayClass = "text-emerald-600";
+                let rawDelay = isAggregated ? (r.delaySum/count) : safeNum(r.delay);
+                if(rawDelay > 3) delayClass = "text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded";
+                else if(rawDelay > 1) delayClass = "text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded";
+
+                let tr = `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
+                
+                if (isAggregated) {
+                    const avgBox = Math.round(r.box/count); const avgCv = Math.round(cv/count);
+                    const avgCp = avgCv === 0 ? 0 : (r.box/cv).toFixed(1);
+                    const avgDrop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
+                    
+                    tr += `
+                        <td class="p-3 text-left font-bold text-slate-800">${r.label}</td>
+                        <td class="p-3 font-black text-slate-900 leading-snug">${formatAggr(r.box, avgBox)}</td>
+                        <td class="p-3 font-bold leading-snug">${formatAggr(ch, Math.round(ch/count))}</td>
+                        <td class="p-3 font-bold border-l border-slate-200 text-blue-600 leading-snug">${formatAggr(cv, avgCv)}</td>
+                        <td class="p-3 bg-slate-50/50 leading-snug">${formatAggr(r.owned, Math.round(r.owned/count))}</td>
+                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600 leading-snug">${formatAggr(r.hired, Math.round(r.hired/count))}</td>
+                        <td class="p-3 font-bold text-cyan-600 align-middle">${avgCp}</td>
+                        <td class="p-3 bg-slate-50/50 border-l border-slate-200 leading-snug text-[11px] text-slate-500">
+                            <span class="text-slate-700 font-bold">${r.r1House.toLocaleString()}</span><br>${r.r1Veh}대 / 단${r.r1Sin}
+                        </td>
+                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 leading-snug text-[11px] text-slate-500">
+                            <span class="text-slate-700 font-bold">${r.r3House.toLocaleString()}</span><br>${r.r3Veh}대 / 단${r.r3Sin}
+                        </td>
+                        <td class="p-3 align-middle"><span class="${delayClass}">${rawDelay.toFixed(2)}%</span></td>
+                        <td class="p-3 font-bold text-purple-600 align-middle">${avgDrop}</td>
+                        <td class="p-3 font-bold text-emerald-600 text-right align-middle">${(r.box*UNIT_REVENUE).toLocaleString()}</td>
+                    `;
+                } else {
+                    const cp = cv === 0 ? 0 : (r.box/cv).toFixed(1);
+                    const drop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
+                    
+                    tr += `
+                        <td class="p-3 text-left font-bold text-slate-800">${r.date}</td>
+                        <td class="p-3 font-black text-slate-900">${r.box.toLocaleString()}</td>
+                        <td class="p-3 font-bold">${ch.toLocaleString()}</td>
+                        <td class="p-3 font-bold border-l border-slate-200 text-blue-600">${cv}</td>
+                        <td class="p-3 bg-slate-50/50">${r.owned}</td>
+                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600">${r.hired}</td>
+                        <td class="p-3 font-bold text-cyan-600">${cp}</td>
+                        <td class="p-3 bg-slate-50/50 border-l border-slate-200 text-[11px] text-slate-500">
+                            <span class="text-slate-700 font-bold">${r.r1House}</span> / ${r.r1Veh} / ${r.r1Sin}
+                        </td>
+                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-[11px] text-slate-500">
+                            <span class="text-slate-700 font-bold">${r.r3House}</span> / ${r.r3Veh} / ${r.r3Sin}
+                        </td>
+                        <td class="p-3"><span class="${delayClass}">${rawDelay}%</span></td>
+                        <td class="p-3 font-bold text-purple-600">${drop}</td>
+                        <td class="p-3 font-bold text-emerald-600 text-right">${(r.box*UNIT_REVENUE).toLocaleString()}</td>
+                        <td class="p-3 text-center border-l border-slate-200">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="editRecord('${r.date}')" class="text-blue-500 hover:text-blue-700" title="수정"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                                <button onclick="deleteRecord('${r.date}')" class="text-rose-500 hover:text-rose-700" title="삭제"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                            </div>
+                        </td>
+                    `;
+                }
+                tr += `</tr>`;
+                mainTbody.innerHTML += tr;
+            });
         }
 
-        function openDataModal() { document.getElementById('dataTextarea').value = JSON.stringify(db); document.getElementById('dataModal').classList.remove('hidden'); }
-        function closeDataModal() { document.getElementById('dataModal').classList.add('hidden'); }
-        function copyDataText() { document.getElementById('dataTextarea').select(); document.execCommand('copy'); alert('복사되었습니다.'); }
-        function applyDataText() {
-            try {
-                const parsed = JSON.parse(document.getElementById('dataTextarea').value);
-                if(Array.isArray(parsed)) { db = parsed; updateDashboard(); closeDataModal(); alert('복원 완료'); }
-                else alert('형식 오류');
-            } catch(e) { alert('텍스트 파싱 실패'); }
+        // Object structure helpers
+        function initGroup(grouped, key, label, date) {
+            grouped[key] = { key, label, date, count:0, box:0, owned:0, hired:0, r1House:0, r1Veh:0, r1Sin:0, r3House:0, r3Veh:0, r3Sin:0, delaySum:0, timeTrunkMins:0, timeDepartMins:0, trunkCount:0, departCount:0 };
+        }
+        function addRecordToGroup(g, r) {
+            g.count++; g.box+=safeNum(r.box); g.owned+=safeNum(r.owned); g.hired+=safeNum(r.hired); g.r1House+=safeNum(r.r1House); g.r1Veh+=safeNum(r.r1Veh); g.r1Sin+=safeNum(r.r1Sin); g.r3House+=safeNum(r.r3House); g.r3Veh+=safeNum(r.r3Veh); g.r3Sin+=safeNum(r.r3Sin); g.delaySum+=safeNum(r.delay);
+            let tm=timeToMins(r.timeTrunk); if(tm!==null){g.timeTrunkMins+=tm; g.trunkCount++;}
+            let dm=timeToMins(r.timeDepart); if(dm!==null){g.timeDepartMins+=dm; g.departCount++;}
         }
 
         function downloadExcel() {
-            const filter = document.getElementById('monthFilter').value;
-            const isSummary = (filter === 'MONTHLY' || filter === 'WEEKLY');
-            
             if(currentViewData.length === 0) return alert('추출할 데이터가 없습니다.');
+            const filter = document.getElementById('monthFilter').value || 'ALL';
+            const isSummary = (currentNav !== 'DAILY');
             
             const rows = currentViewData.map(d => {
-                if (isSummary) {
-                    const cv = d.owned + d.hired;
-                    const ch = d.r1House + d.r3House;
+                const cv = (d.owned||0) + (d.hired||0);
+                const ch = (d.r1House||0) + (d.r3House||0);
+                if (isSummary || currentSubNav === 'WEEK') {
                     return {
-                        "기간": d.label, 
-                        "총물동량(BOX)": d.box, "총가구수": ch, 
-                        "총대수": cv, "지입차": d.owned, "용차": d.hired,
-                        "평균생산성(BOX/대)": cv===0?0:(d.box/cv).toFixed(1),
-                        "1차총가구": d.r1House, "1차총배차": d.r1Veh, "1차총단회": d.r1Sin,
-                        "3차총가구": d.r3House, "3차총배차": d.r3Veh, "3차총단회": d.r3Sin,
+                        "기간": d.label, "총물동량": d.box, "총가구수": ch, "총대수": cv, "지입": d.owned, "용차": d.hired,
+                        "평균생산성": cv===0?0:(d.box/cv).toFixed(1),
+                        "1차가구": d.r1House, "1차배차": d.r1Veh, "1차단회": d.r1Sin,
+                        "3차가구": d.r3House, "3차배차": d.r3Veh, "3차단회": d.r3Sin,
                         "평균지연율(%)": d.count===0?0:(d.delaySum/d.count).toFixed(2),
-                        "평균점착(BOX/가구)": ch === 0 ? 0 : (d.box / ch).toFixed(2),
-                        "총매출액": d.box*UNIT_REVENUE, "총영업이익": d.box*UNIT_PROFIT
+                        "평균점착(BOX/가)": ch===0?0:(d.box/ch).toFixed(2),
+                        "매출액": d.box*UNIT_REVENUE
                     };
                 } else {
-                    const tv = safeNum(d.owned) + safeNum(d.hired);
-                    const ch = safeNum(d.r1House) + safeNum(d.r3House);
                     return {
-                        "일자": d.date || '알수없음', 
-                        "물동량(BOX)": safeNum(d.box), "총가구수": ch, 
-                        "총대수": tv, "지입차": safeNum(d.owned), "용차": safeNum(d.hired),
-                        "생산성(BOX/대)": tv===0?0:(safeNum(d.box)/tv).toFixed(1),
-                        "1차가구": safeNum(d.r1House), "1차배차": safeNum(d.r1Veh), "1차단회": safeNum(d.r1Sin),
-                        "3차가구": safeNum(d.r3House), "3차배차": safeNum(d.r3Veh), "3차단회": safeNum(d.r3Sin),
-                        "간선막차": d.timeTrunk, "최종출차": d.timeDepart, 
-                        "지연율(%)": safeNum(d.delay),
-                        "점착/BOX": ch === 0 ? 0 : (safeNum(d.box) / ch).toFixed(2),
-                        "매출액": safeNum(d.box)*UNIT_REVENUE, "영업이익": safeNum(d.box)*UNIT_PROFIT
+                        "일자": d.date, "물동량": d.box, "가구수": ch, "총대수": cv, "지입": d.owned, "용차": d.hired,
+                        "생산성": cv===0?0:(d.box/cv).toFixed(1),
+                        "1차가구": d.r1House, "1차배차": d.r1Veh, "1차단회": d.r1Sin,
+                        "3차가구": d.r3House, "3차배차": d.r3Veh, "3차단회": d.r3Sin,
+                        "지연율(%)": d.delay, "점착(BOX/가)": ch===0?0:(d.box/ch).toFixed(2),
+                        "매출액": d.box*UNIT_REVENUE
                     };
                 }
             });
             
             const ws = XLSX.utils.json_to_sheet(rows);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "KPI_Report");
-            XLSX.writeFile(wb, `물류KPI_${filter}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "KPI");
+            XLSX.writeFile(wb, `물류KPI_${currentNav}.xlsx`);
         }
 
-        generateWeekOptions();
         document.getElementById('i-date').value = new Date().toISOString().split('T')[0];
         if(SCRIPT_URL !== "여기에_복사한_URL_주소를_넣어주세요") fetchDataFromGoogle();
-        else updateDashboard();
+        else { setNavView('YEARLY'); updateDashboard(); }
     </script>
 </body>
 </html>
