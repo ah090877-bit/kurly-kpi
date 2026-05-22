@@ -263,7 +263,7 @@
         // Chart Layout Config
         const commonGrid = { color: '#f1f5f9', drawBorder: false, borderDash: [4, 4] };
 
-        // 🛠️ [복구 완료] 데이터 파싱 및 안전 가공을 위한 핵심 누락 유틸리티 함수들
+        // 데이터 파싱 및 안전 가공을 위한 핵심 유틸리티 함수들
         function safeNum(val) {
             if (val === undefined || val === null || val === '') return 0;
             const num = Number(val);
@@ -338,23 +338,26 @@
         function setNavView(view) {
             currentNav = view;
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${view}`).classList.add('active');
+            const targetNav = document.getElementById(`nav-${view}`);
+            if (targetNav) targetNav.classList.add('active');
             
             const monthTabContainer = document.getElementById('monthTabContainer');
             const viewTitle = document.getElementById('currentViewTitle');
 
-            monthTabContainer.classList.add('hidden');
+            if (monthTabContainer) monthTabContainer.classList.add('hidden');
 
-            if (view === 'YEARLY') {
-                viewTitle.innerText = '연간 KPI 요약 리포트';
-            } else if (view === 'MONTHLY_KPI') {
-                viewTitle.innerText = '월별 KPI 요약 분석';
-            } else if (view === 'WEEKLY_KPI') {
-                viewTitle.innerText = '주별 KPI 흐름 분석';
-            } else if (view === 'DAILY_DETAIL') {
-                viewTitle.innerText = '일별 실적 상세 대장';
-                monthTabContainer.classList.remove('hidden');
-                renderMonthTabs();
+            if (viewTitle) {
+                if (view === 'YEARLY') {
+                    viewTitle.innerText = '연간 KPI 요약 리포트';
+                } else if (view === 'MONTHLY_KPI') {
+                    viewTitle.innerText = '월별 KPI 요약 분석';
+                } else if (view === 'WEEKLY_KPI') {
+                    viewTitle.innerText = '주별 KPI 흐름 분석';
+                } else if (view === 'DAILY_DETAIL') {
+                    viewTitle.innerText = '일별 실적 상세 대장';
+                    if (monthTabContainer) monthTabContainer.classList.remove('hidden');
+                    renderMonthTabs();
+                }
             }
             updateDashboard();
         }
@@ -560,7 +563,7 @@
                 viewData = [...filteredDB];
             }
 
-            // 🛠️ [복구 완료] 다운로드용 전역 변수 동기화 바인딩
+            // 다운로드용 전역 변수 동기화 바인딩
             currentViewData = viewData;
 
             // 차트 렌더링 라벨 생성
@@ -586,197 +589,4 @@
             if(chartInstance2) chartInstance2.destroy();
             const effColors = viewData.map(d => {
                 const v = safeNum(d.owned) + safeNum(d.hired);
-                const h = safeNum(r1House in d ? d.r1House : d.r1House) + safeNum(r3House in d ? d.r3House : d.r3House); // 안전성 보완
-                const eff = v === 0 ? 0 : (safeNum(d.r1House) + safeNum(d.r3House)) / v; 
-                return eff < 35 ? '#ef4444' : (eff > 50 ? '#f59e0b' : '#10b981'); 
-            });
-            chartInstance2 = new Chart(document.getElementById('scatterChart'), {
-                type: 'line',
-                data: { 
-                    labels: chartLabels,
-                    datasets: [{ 
-                        label: '효율', data: viewData.map(d=>{
-                            const v = safeNum(d.owned) + safeNum(d.hired);
-                            return v===0?0: parseFloat(((safeNum(d.r1House)+safeNum(d.r3House))/v).toFixed(1));
-                        }), 
-                        borderColor: '#cbd5e1', borderWidth: 1, backgroundColor: effColors,
-                        pointBorderColor: '#ffffff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3
-                    }] 
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: commonGrid } } }
-            });
-
-            if(chartInstance3) chartInstance3.destroy();
-            chartInstance3 = new Chart(document.getElementById('roundChart'), {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [
-                        { label: '1차 가구', data: viewData.map(d=>safeNum(d.r1House)), backgroundColor: '#cbd5e1', borderRadius: 2 },
-                        { label: '3차 가구', data: viewData.map(d=>safeNum(d.r3House)), backgroundColor: '#818cf8', borderRadius: 2 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: commonGrid } }, plugins: { legend: { display: false } } }
-            });
-
-            // 3단계: 표 제목 설정 및 데이터 그리기
-            const mainTable = document.getElementById('mainTable');
-            let labelTitle = '';
-            if (currentNav === 'YEARLY') labelTitle = "연간 총 요약 기록 대장";
-            else if (currentNav === 'MONTHLY_KPI') labelTitle = "월별 KPI 요약 대장 (합계 및 평균)";
-            else if (currentNav === 'WEEKLY_KPI') labelTitle = "주별 KPI 요약 대장 (합계 및 평균)";
-            else labelTitle = `${parseInt(currentSelectedMonth)}월 일별 운영 상세 기록 대장`;
-            
-            safeUpdateText('tableTitleMain', `📋 ${labelTitle}`);
-
-            let thead = `
-                <thead><tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 text-[10px] uppercase tracking-wider">
-                    <th class="p-3 text-left w-24">구분/일자</th>
-                    <th class="p-3 text-slate-800">물동량</th>
-                    <th class="p-3">가구수</th>
-                    <th class="p-3 border-l border-slate-200 text-blue-600">총대수</th>
-                    <th class="p-3 bg-slate-100/50">지입</th>
-                    <th class="p-3 bg-slate-100/50 border-r border-slate-200 text-amber-600">용차</th>
-                    <th class="p-3 text-cyan-600">생산성</th>
-                    
-                    <th class="p-3 bg-slate-50/50 border-l border-slate-200">1차 가구</th>
-                    <th class="p-3 bg-slate-50/50">1차 배차</th>
-                    <th class="p-3 bg-slate-50/50 border-r border-slate-200">1차 단회</th>
-                    <th class="p-3 bg-indigo-50/50">3차 가구</th>
-                    <th class="p-3 bg-indigo-50/50">3차 배차</th>
-                    <th class="p-3 bg-indigo-50/50 border-r border-slate-200">3차 단회</th>
-                    
-                    <th class="p-3">간선막차</th>
-                    <th class="p-3">최종출차</th>
-                    <th class="p-3 text-rose-600">지연배송율</th>
-                    <th class="p-3 text-purple-600">점착/BOX</th>
-                    <th class="p-3 text-emerald-600 text-right">매출액(원)</th>
-                    ${!isSummaryMode ? '<th class="p-3 text-center border-l border-slate-200">관리</th>' : ''}
-                </tr></thead><tbody id="mainTbody" class="divide-y divide-slate-100 text-slate-600 text-[11px] font-medium"></tbody>`;
-            
-            mainTable.innerHTML = thead;
-            const mainTbody = document.getElementById('mainTbody');
-
-            if (viewData.length === 0) {
-                mainTbody.innerHTML = `<tr><td colspan="${isSummaryMode?18:19}" class="p-8 text-slate-400">조회 범위 내 데이터가 없습니다.</td></tr>`;
-                return;
-            }
-
-            const formatCell = (sum, avg) => `${sum.toLocaleString()}<br><span class="text-[9px] text-slate-400 font-normal mt-0.5 inline-block">평균 ${avg.toLocaleString()}</span>`;
-
-            viewData.forEach(r => {
-                const cv = safeNum(r.owned) + safeNum(r.hired);
-                const ch = safeNum(r.r1House) + safeNum(r.r3House);
-                const count = r.count || 1;
-                
-                let delayClass = "text-emerald-600";
-                let rawDelay = isSummaryMode ? (r.delaySum/count) : safeNum(r.delay);
-                if(rawDelay > 3) delayClass = "text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded";
-                else if(rawDelay > 1) delayClass = "text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded";
-
-                let tr = `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
-                
-                if (isSummaryMode) {
-                    const avgBox = Math.round(r.box/count); const avgCv = Math.round(cv/count);
-                    const avgCp = avgCv === 0 ? 0 : (r.box/cv).toFixed(1);
-                    const avgDrop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
-                    
-                    tr += `
-                        <td class="p-3 text-left font-bold text-slate-800">${r.label}</td>
-                        <td class="p-3 font-black text-slate-900 leading-snug">${formatCell(r.box, avgBox)}</td>
-                        <td class="p-3 font-bold leading-snug">${formatCell(ch, Math.round(ch/count))}</td>
-                        <td class="p-3 font-bold border-l border-slate-200 text-blue-600 leading-snug">${formatCell(cv, avgCv)}</td>
-                        <td class="p-3 bg-slate-50/50 leading-snug">${formatCell(r.owned, Math.round(r.owned/count))}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600 leading-snug">${formatCell(r.hired, Math.round(r.hired/count))}</td>
-                        <td class="p-3 font-bold text-cyan-600 align-middle">${avgCp}</td>
-                        
-                        <td class="p-3 bg-slate-50/50 border-l border-slate-200 leading-snug">${formatCell(r.r1House, Math.round(r.r1House/count))}</td>
-                        <td class="p-3 bg-slate-50/50 leading-snug">${formatCell(r.r1Veh, (r.r1Veh/count).toFixed(1))}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 leading-snug text-indigo-400">${formatCell(r.r1Sin, (r.r1Sin/count).toFixed(1))}</td>
-                        
-                        <td class="p-3 bg-indigo-50/50 leading-snug">${formatCell(r.r3House, Math.round(r.r3House/count))}</td>
-                        <td class="p-3 bg-indigo-50/50 leading-snug">${formatCell(r.r3Veh, (r.r3Veh/count).toFixed(1))}</td>
-                        <td class="p-3 bg-indigo-50/50 border-r border-slate-200 leading-snug text-cyan-500">${formatCell(r.r1Sin, (r.r3Sin/count).toFixed(1))}</td>
-                        
-                        <td class="p-3 align-middle text-slate-500">${r.trunkCount>0 ? minsToTime(r.timeTrunkMins/r.trunkCount) : '-'}</td>
-                        <td class="p-3 align-middle text-slate-500">${r.departCount>0 ? minsToTime(r.timeDepartMins/r.departCount) : '-'}</td>
-                        
-                        <td class="p-3 align-middle"><span class="${delayClass}">${rawDelay.toFixed(2)}%</span></td>
-                        <td class="p-3 font-bold text-purple-600 align-middle">${avgDrop}</td>
-                        <td class="p-3 font-bold text-emerald-600 text-right align-middle">${(r.box*UNIT_REVENUE).toLocaleString()}</td>
-                    `;
-                } else {
-                    const cp = cv === 0 ? 0 : (r.box/cv).toFixed(1);
-                    const drop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
-                    
-                    tr += `
-                        <td class="p-3 text-left font-bold text-slate-800">${r.date}</td>
-                        <td class="p-3 font-black text-slate-900">${r.box.toLocaleString()}</td>
-                        <td class="p-3 font-bold">${ch.toLocaleString()}</td>
-                        <td class="p-3 font-bold border-l border-slate-200 text-blue-600">${cv}</td>
-                        <td class="p-3 bg-slate-50/50">${r.owned}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600">${r.hired}</td>
-                        <td class="p-3 font-bold text-cyan-600">${cp}</td>
-                        
-                        <td class="p-3 bg-slate-50/50 border-l border-slate-200">${r.r1House.toLocaleString()}</td>
-                        <td class="p-3 bg-slate-50/50">${r.r1Veh}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400">${r.r1Sin}</td>
-                        
-                        <td class="p-3 bg-indigo-50/50">${r.r3House.toLocaleString()}</td>
-                        <td class="p-3 bg-indigo-50/50">${r.r3Veh}</td>
-                        <td class="p-3 bg-indigo-50/50 border-r border-slate-200 text-cyan-500">${r.r3Sin}</td>
-                        
-                        <td class="p-3 text-slate-500">${r.timeTrunk || '-'}</td>
-                        <td class="p-3 text-slate-500">${r.timeDepart || '-'}</td>
-                        <td class="p-3"><span class="${delayClass}">${rawDelay}%</span></td>
-                        <td class="p-3 font-bold text-purple-600">${drop}</td>
-                        <td class="p-3 font-bold text-emerald-600 text-right">${(r.box*UNIT_REVENUE).toLocaleString()}</td>
-                        <td class="p-3 text-center border-l border-slate-200">
-                            <div class="flex items-center justify-center gap-2">
-                                <button onclick="editRecord('${r.date}')" class="text-blue-500 hover:text-blue-700" title="수정"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
-                                <button onclick="deleteRecord('${r.date}')" class="text-rose-500 hover:text-rose-700" title="삭제"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                            </div>
-                        </td>
-                    `;
-                }
-                tr += `</tr>`;
-                mainTbody.innerHTML += tr;
-            });
-        }
-
-        function downloadExcel() {
-            if(!currentViewData || currentViewData.length === 0) return alert('추출할 데이터가 없습니다.');
-            const isSummary = (currentNav !== 'DAILY_DETAIL');
-            const rows = currentViewData.map(d => {
-                const cv = (d.owned||0) + (d.hired||0);
-                const ch = (d.r1House||0) + (d.r3House||0);
-                if (isSummary) {
-                    return {
-                        "구분": d.label, "물동량(BOX)": d.box, "총가구수": ch, "총대수": cv, "지입": d.owned, "용차": d.hired,
-                        "1차가구": d.r1House, "1차배차": d.r1Veh, "1차단회": d.r1Sin,
-                        "3차가구": d.r3House, "3차배차": d.r3Veh, "3차단회": d.r3Sin,
-                        "평균지연배송율(%)": d.count===0?0:(d.delaySum/d.count).toFixed(2),
-                        "점착/BOX": ch===0?0:(d.box/ch).toFixed(2), "매출액(원)": d.box*UNIT_REVENUE
-                    };
-                } else {
-                    return {
-                        "일자": d.date, "물동량(BOX)": d.box, "가구수": ch, "총대수": cv, "지입": d.owned, "용차": d.hired,
-                        "1차가구": d.r1House, "1차배차": d.r1Veh, "1차단회": d.r1Sin,
-                        "3차가구": d.r3House, "3차배차": d.r3Veh, "3차단회": d.r3Sin,
-                        "지연배송율(%)": d.delay, "점착/BOX": ch===0?0:(d.box/ch).toFixed(2), "매출액(원)": d.box*UNIT_REVENUE
-                    };
-                }
-            });
-            const ws = XLSX.utils.json_to_sheet(rows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Logistics_KPI");
-            XLSX.writeFile(wb, `물류통합KPI_Report_${currentNav}.xlsx`);
-        }
-
-        // 초기 구동 세팅
-        document.getElementById('i-date').value = new Date().toISOString().split('T')[0];
-        if(SCRIPT_URL !== "여기에_복사한_URL_주소를_넣어주세요") fetchDataFromGoogle();
-        else { setNavView('YEARLY'); }
-    </script>
-</body>
-</html>
+                const h = safeNum(d.r1House) + safeNum(d.r3House);
