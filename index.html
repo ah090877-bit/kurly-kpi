@@ -263,6 +263,30 @@
         // Chart Layout Config
         const commonGrid = { color: '#f1f5f9', drawBorder: false, borderDash: [4, 4] };
 
+        // 🛠️ [복구 완료] 데이터 파싱 및 안전 가공을 위한 핵심 누락 유틸리티 함수들
+        function safeNum(val) {
+            if (val === undefined || val === null || val === '') return 0;
+            const num = Number(val);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function timeToMins(timeStr) {
+            if (!timeStr || timeStr === '-') return null;
+            const parts = timeStr.split(':');
+            if (parts.length !== 2) return null;
+            const hrs = parseInt(parts[0], 10);
+            const mins = parseInt(parts[1], 10);
+            if (isNaN(hrs) || isNaN(mins)) return null;
+            return hrs * 60 + mins;
+        }
+
+        function minsToTime(mins) {
+            if (mins === null || isNaN(mins)) return '-';
+            const hrs = Math.floor(mins / 60);
+            const m = Math.round(mins % 60);
+            return `${String(hrs).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
         // 일~토 절대 주차 도출 엔진
         function getAbsoluteWeek(dateStr) {
             const d = new Date(dateStr);
@@ -306,7 +330,8 @@
         }
 
         function showLoading(show) {
-            document.getElementById('loadingModal').style.display = show ? 'flex' : 'none';
+            const loader = document.getElementById('loadingModal');
+            if(loader) loader.style.display = show ? 'flex' : 'none';
         }
 
         // --- 좌측 내비게이션 전환 제어 핵심 로직 ---
@@ -431,11 +456,13 @@
                 const text = await res.text();
                 db = JSON.parse(text);
                 updateDashboard();
-            } catch (e) { alert("구글 서버 통신 실패"); } 
+            } catch (e) { 
+                console.error(e);
+                alert("구글 서버 데이터 처리 실패: " + e.message); 
+            } 
             finally { showLoading(false); }
         }
 
-        // 데이터 계산을 위한 기본 숫자 정형화 파서
         function initGroup(grouped, key, label, date) {
             grouped[key] = { key, label, date, count:0, box:0, owned:0, hired:0, r1House:0, r1Veh:0, r1Sin:0, r3House:0, r3Veh:0, r3Sin:0, delaySum:0, timeTrunkMins:0, timeDepartMins:0, trunkCount:0, departCount:0 };
         }
@@ -456,7 +483,6 @@
             if (currentNav === 'YEARLY' || currentNav === 'MONTHLY_KPI' || currentNav === 'WEEKLY_KPI') {
                 filteredDB = db.filter(d => d.date && d.date.length > 5);
             } else if (currentNav === 'DAILY_DETAIL') {
-                // 일별 상세 뷰 선택 시 사용자가 지정한 월만 엄격하게 필터링
                 filteredDB = db.filter(d => d.date && d.date.substring(5, 7) === currentSelectedMonth);
             }
 
@@ -505,13 +531,11 @@
             // 2단계: 표에 시각화할 내부 데이터의 빌드 (Grouping 결정)
             let viewData = [];
             if (currentNav === 'YEARLY') {
-                // 연간 요약은 전체 데이터를 모아 단 한 줄의 '연간 누적치'로 요약함
                 const grouped = {};
                 initGroup(grouped, '2026', '2026년 연간 전체 누적', '2026-12-31');
                 filteredDB.forEach(r => addRecordToGroup(grouped['2026'], r));
                 viewData = Object.values(grouped);
             } else if (currentNav === 'MONTHLY_KPI') {
-                // 연간 KPI 형태가 월별로 모여 있는 요약 대장 구조
                 const grouped = {};
                 filteredDB.forEach(r => {
                     let key = r.date.substring(0, 7);
@@ -521,7 +545,6 @@
                 });
                 viewData = Object.values(grouped).sort((a,b) => a.key.localeCompare(b.key));
             } else if (currentNav === 'WEEKLY_KPI') {
-                // 주별 요약 대장 구조
                 const grouped = {};
                 filteredDB.forEach(r => {
                     const info = getMonthlyWeekName(r.date);
@@ -534,9 +557,11 @@
                 });
                 viewData = Object.values(grouped).sort((a,b) => a.key.localeCompare(b.key));
             } else {
-                // DAILY_DETAIL: 생 데이터 노출
                 viewData = [...filteredDB];
             }
+
+            // 🛠️ [복구 완료] 다운로드용 전역 변수 동기화 바인딩
+            currentViewData = viewData;
 
             // 차트 렌더링 라벨 생성
             const chartLabels = viewData.map(d => isSummaryMode ? d.label : parseInt(d.date.substring(8)) + '일');
@@ -561,8 +586,8 @@
             if(chartInstance2) chartInstance2.destroy();
             const effColors = viewData.map(d => {
                 const v = safeNum(d.owned) + safeNum(d.hired);
-                const h = safeNum(d.r1House) + safeNum(d.r3House);
-                const eff = v === 0 ? 0 : h / v; 
+                const h = safeNum(r1House in d ? d.r1House : d.r1House) + safeNum(r3House in d ? d.r3House : d.r3House); // 안전성 보완
+                const eff = v === 0 ? 0 : (safeNum(d.r1House) + safeNum(d.r3House)) / v; 
                 return eff < 35 ? '#ef4444' : (eff > 50 ? '#f59e0b' : '#10b981'); 
             });
             chartInstance2 = new Chart(document.getElementById('scatterChart'), {
@@ -594,7 +619,7 @@
                 options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: commonGrid } }, plugins: { legend: { display: false } } }
             });
 
-            // 3단계: 표 제목 설정 및 데이터 그리기 (독립형 1차/3차 열 완전 유지)
+            // 3단계: 표 제목 설정 및 데이터 그리기
             const mainTable = document.getElementById('mainTable');
             let labelTitle = '';
             if (currentNav === 'YEARLY') labelTitle = "연간 총 요약 기록 대장";
@@ -671,7 +696,7 @@
                         
                         <td class="p-3 bg-indigo-50/50 leading-snug">${formatCell(r.r3House, Math.round(r.r3House/count))}</td>
                         <td class="p-3 bg-indigo-50/50 leading-snug">${formatCell(r.r3Veh, (r.r3Veh/count).toFixed(1))}</td>
-                        <td class="p-3 bg-indigo-50/50 border-r border-slate-200 leading-snug text-cyan-500">${formatCell(r.r3Sin, (r.r3Sin/count).toFixed(1))}</td>
+                        <td class="p-3 bg-indigo-50/50 border-r border-slate-200 leading-snug text-cyan-500">${formatCell(r.r1Sin, (r.r3Sin/count).toFixed(1))}</td>
                         
                         <td class="p-3 align-middle text-slate-500">${r.trunkCount>0 ? minsToTime(r.timeTrunkMins/r.trunkCount) : '-'}</td>
                         <td class="p-3 align-middle text-slate-500">${r.departCount>0 ? minsToTime(r.timeDepartMins/r.departCount) : '-'}</td>
@@ -681,7 +706,6 @@
                         <td class="p-3 font-bold text-emerald-600 text-right align-middle">${(r.box*UNIT_REVENUE).toLocaleString()}</td>
                     `;
                 } else {
-                    // 일별 생 데이터 조회 뷰 포맷
                     const cp = cv === 0 ? 0 : (r.box/cv).toFixed(1);
                     const drop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
                     
@@ -721,7 +745,7 @@
         }
 
         function downloadExcel() {
-            if(currentViewData.length === 0) return alert('추출할 데이터가 없습니다.');
+            if(!currentViewData || currentViewData.length === 0) return alert('추출할 데이터가 없습니다.');
             const isSummary = (currentNav !== 'DAILY_DETAIL');
             const rows = currentViewData.map(d => {
                 const cv = (d.owned||0) + (d.hired||0);
