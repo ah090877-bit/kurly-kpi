@@ -102,7 +102,7 @@
         <div id="dashboard-wrapper" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             
             <div id="dashboard-view" class="space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-10 gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-12 gap-3">
                     <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #64748b;">
                         <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-slate-100 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">총 정산 매출액</p>
@@ -115,7 +115,7 @@
                         <p id="kpi-profit" class="text-lg md:text-xl xl:text-[1.55rem] font-black text-emerald-600 mt-2 tracking-tight break-all whitespace-normal">0원</p>
                         <p class="text-[9px] md:text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-1.5 md:px-2 py-0.5 rounded border border-emerald-100">마진(2.99%) + 임대수익</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #3b82f6;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-2" style="border-top-color: #3b82f6;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">누적 물동량</p>
                         <p id="kpi-box" class="text-lg md:text-xl xl:text-2xl font-extrabold text-slate-800 mt-1.5 truncate">0</p>
                         <p class="text-[9px] md:text-[10px] text-blue-600 font-bold mt-2 bg-blue-50 inline-block px-1 rounded">전체 출고</p>
@@ -140,7 +140,7 @@
                         <p id="kpi-single" class="text-lg md:text-xl xl:text-2xl font-extrabold text-cyan-600 mt-1.5 truncate">0%</p>
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1 flex flex-col justify-between" style="border-top-color: #ef4444;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-2 flex flex-col justify-between" style="border-top-color: #ef4444;">
                         <div>
                             <p class="text-[9px] md:text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider flex justify-between items-center truncate">
                                 지연배송율 <span id="kpi-success" class="text-[8px] md:text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 ml-1"></span>
@@ -341,7 +341,6 @@
             return String(h).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
         }
 
-        // 💡 연간 KPI 삭제 후, 기본 로딩 뷰를 MONTHLY_KPI로 변경
         let currentNav = 'MONTHLY_KPI';
         let currentSelectedMonth = String(new Date().getMonth() + 1).padStart(2, '0'); 
 
@@ -815,14 +814,11 @@
                 let delayClass = rawDelay > 3 ? "text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded" : (rawDelay > 1 ? "text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded" : "text-emerald-600");
 
                 let cellRevHtml = '';
-                if(isAggr) {
+                
+                // 💡 주별 KPI에서는 임대 데이터를 제외하도록 조건문(MONTHLY_KPI) 수정 
+                if (isAggr && currentNav === 'MONTHLY_KPI') {
                     let monthlyRent = 0;
-                    if (currentNav === 'MONTHLY_KPI') { 
-                        rentalDB.forEach(rent => { if(rent.month === r.key) monthlyRent += rent.total; }); 
-                    } else if (currentNav === 'WEEKLY_KPI') {
-                        rentalDB.forEach(rent => { if(rent.month && r.label.includes(rent.month.substring(5,7))) monthlyRent += rent.total / 4.3; }); 
-                        monthlyRent = Math.round(monthlyRent);
-                    }
+                    rentalDB.forEach(rent => { if(rent.month === r.key) monthlyRent += rent.total; }); 
                     
                     const mKurly = r.box * UNIT_REVENUE;
                     const mTotal = mKurly + monthlyRent;
