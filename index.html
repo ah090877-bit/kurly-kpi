@@ -11,26 +11,21 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Inter', 'Pretendard', sans-serif; background-color: #f8fafc; color: #0f172a; }
         
-        /* Custom Scrollbar for Main Content */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Hide scrollbar for mobile top nav */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* KPI Card Styling */
         .kpi-card { background: #ffffff; border: 1px solid #e2e8f0; border-top-width: 4px; transition: transform 0.2s, box-shadow 0.2s; }
         .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
         
-        /* Sidebar/Top Navigation */
         .nav-item.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); font-weight: 700;}
         .nav-item { color: #64748b; transition: all 0.2s; font-weight: 600;}
         .nav-item:hover:not(.active) { background-color: #f1f5f9; color: #0f172a; }
         
-        /* Month Tabs */
         .month-tab.active { background-color: #1e293b; color: white; font-weight: 700; border-color: #1e293b; }
         .month-tab { color: #475569; background-color: white; border: 1px solid #cbd5e1; transition: all 0.15s; }
         .month-tab:hover:not(.active) { background-color: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
@@ -56,9 +51,7 @@
         </div>
 
         <nav class="flex md:flex-col flex-1 px-2 md:px-4 py-2 md:py-6 gap-2 md:gap-0 md:space-y-1.5 overflow-x-auto md:overflow-y-auto scrollbar-hide whitespace-nowrap items-center md:items-stretch">
-            
             <p class="hidden md:block px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 mt-2 md:mt-0">운영 실적 분석</p>
-            
             <button onclick="setNavView('MONTHLY_KPI')" id="nav-MONTHLY_KPI" class="nav-item active w-auto md:w-full flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-xl text-sm shrink-0">
                 <span class="text-base md:text-lg">📈</span> 월별 KPI
             </button>
@@ -71,7 +64,6 @@
             
             <div class="hidden md:block h-4 shrink-0"></div>
             <p class="hidden md:block px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 shrink-0">수익/정산 관리</p>
-            
             <button onclick="setNavView('RENTAL_MGMT')" id="nav-RENTAL_MGMT" class="nav-item w-auto md:w-full flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-xl text-sm border border-slate-100 bg-slate-50/50 shrink-0">
                 <span class="text-base md:text-lg">🚙</span> 임대/지입 관리
             </button>
@@ -90,9 +82,7 @@
                 <h2 id="currentViewTitle" class="text-lg md:text-xl font-extrabold text-slate-800">월별 KPI 요약 리포트</h2>
             </div>
             <div class="flex items-center gap-2 md:gap-3">
-                <button onclick="downloadExcel()" class="md:hidden bg-white text-slate-600 border border-slate-300 p-2 rounded-lg shadow-sm">
-                    ⬇️
-                </button>
+                <button onclick="downloadExcel()" class="md:hidden bg-white text-slate-600 border border-slate-300 p-2 rounded-lg shadow-sm">⬇️</button>
                 <button onclick="fetchDataFromGoogle()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-bold py-2 md:py-2.5 px-3 md:px-5 rounded-lg flex items-center transition shadow-md gap-1.5 md:gap-2">
                     <span id="syncIcon">🔄</span> <span class="hidden md:inline">최신 DB 동기화</span><span class="md:hidden">동기화</span>
                 </button>
@@ -155,7 +145,7 @@
                 </div>
 
                 <div id="chartSection" class="grid grid-cols-1 xl:grid-cols-4 gap-4 md:gap-6">
-                    <div class="xl:col-span-3 space-y-4 md:space-y-6">
+                    <div class="xl:col-span-3 flex flex-col gap-4 md:gap-6">
                         <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
                             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4 md:mb-6">
                                 <h3 id="trendChartTitle" class="text-sm md:text-base font-bold text-slate-800">물동량 및 생산성 트렌드</h3>
@@ -169,17 +159,22 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                                <div class="mb-4">
-                                    <h3 id="scatterChartTitle" class="text-sm md:text-base font-bold text-slate-800">차량 투입 가동 효율</h3>
-                                </div>
+                                <div class="mb-4"><h3 id="scatterChartTitle" class="text-sm md:text-base font-bold text-slate-800">차량 투입 가동 효율</h3></div>
                                 <div class="h-[200px] md:h-[240px] w-full"><canvas id="scatterChart"></canvas></div>
                             </div>
-                            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                                <div class="mb-4">
-                                    <h3 class="text-sm md:text-base font-bold text-slate-800">회차별 공급 비중 구조</h3>
-                                </div>
+                            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                                <div class="mb-4"><h3 class="text-sm md:text-base font-bold text-slate-800">회차별 공급 비중 구조</h3></div>
                                 <div class="h-[200px] md:h-[240px] w-full"><canvas id="roundChart"></canvas></div>
                             </div>
+                        </div>
+
+                        <div class="bg-indigo-50/50 border border-indigo-100 p-4 md:p-6 rounded-2xl shadow-sm">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-xl">✨</span>
+                                <h3 class="text-sm md:text-base font-extrabold text-indigo-900">AI 운영 추이 및 예측 리포트</h3>
+                            </div>
+                            <div id="aiReportContent" class="text-[11px] md:text-xs text-indigo-800 space-y-2.5 leading-relaxed font-medium">
+                                </div>
                         </div>
                     </div>
 
@@ -612,7 +607,6 @@
             }
         }
 
-        // 💡 임대/지입 관리 화면을 요약표와 상세표로 분리해서 렌더링하도록 수정된 함수
         function renderRentalTable() {
             const tbody = document.getElementById('rentalTableBody');
             const sumBody = document.getElementById('rentalSummaryBody');
@@ -621,7 +615,6 @@
 
             rentalDB.sort((a,b) => new Date(b.month) - new Date(a.month)); 
 
-            // 1. 상세 대장 렌더링
             rentalDB.forEach(r => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
@@ -639,7 +632,6 @@
                     </tr>`;
             });
 
-            // 2. 월별 요약표 데이터 집계 및 렌더링
             const summary = {};
             rentalDB.forEach(r => {
                 if(!summary[r.month]) summary[r.month] = { count: 0, deduction: 0, total: 0 };
@@ -648,7 +640,7 @@
                 summary[r.month].total += safeNum(r.total);
             });
 
-            const sortedMonths = Object.keys(summary).sort((a,b) => new Date(b) - new Date(a)); // 최신순 정렬
+            const sortedMonths = Object.keys(summary).sort((a,b) => new Date(b) - new Date(a)); 
 
             if(sortedMonths.length === 0) {
                 sumBody.innerHTML = `<tr><td colspan="4" class="p-4 md:p-6 text-center text-slate-400">등록된 정산 내역이 없습니다.</td></tr>`;
@@ -674,6 +666,98 @@
             g.count++; g.box+=safeNum(r.box); g.owned+=safeNum(r.owned); g.hired+=safeNum(r.hired); g.r1House+=safeNum(r.r1House); g.r1Veh+=safeNum(r.r1Veh); g.r1Sin+=safeNum(r.r1Sin); g.r3House+=safeNum(r.r3House); g.r3Veh+=safeNum(r.r3Veh); g.r3Sin+=safeNum(r.r3Sin); g.delaySum+=safeNum(r.delay);
             let tm=timeToMins(r.timeTrunk); if(tm!==null){g.timeTrunkMins+=tm; g.trunkCount++;}
             let dm=timeToMins(r.timeDepart); if(dm!==null){g.timeDepartMins+=dm; g.departCount++;}
+        }
+
+        // 💡 1. AI 리포트 생성기 (자바스크립트 기반 Pseudo-AI)
+        function generateAIReport() {
+            const aiBox = document.getElementById('aiReportContent');
+            if (!aiBox) return;
+
+            if (currentViewData.length === 0) {
+                aiBox.innerHTML = '<p class="text-slate-400">데이터가 부족하여 AI 분석을 수행할 수 없습니다.</p>';
+                return;
+            }
+
+            let html = '';
+            const tBox = currentViewData.reduce((sum, d) => sum + safeNum(d.box), 0);
+            const dataLen = currentViewData.length;
+
+            if (currentNav === 'DAILY_DETAIL') {
+                const avgBox = tBox / dataLen;
+                const estEndBox = Math.round((tBox / dataLen) * 30); 
+                
+                // 단기 추이 분석 (최근 7일)
+                let trendMsg = '';
+                if (dataLen >= 14) {
+                    const rec7 = currentViewData.slice(-7).reduce((sum, d) => sum + safeNum(d.box), 0);
+                    const past7 = currentViewData.slice(-14, -7).reduce((sum, d) => sum + safeNum(d.box), 0);
+                    const diffRatio = (((rec7 - past7) / (past7 || 1)) * 100).toFixed(1);
+                    const trendWord = diffRatio > 0 ? `<span class="text-rose-600 font-extrabold">증가(▲${diffRatio}%)</span>` : `<span class="text-blue-600 font-extrabold">감소(▼${Math.abs(diffRatio)}%)</span>`;
+                    trendMsg = `최근 7일 기준 물동량은 직전 7일 대비 ${trendWord} 흐름을 보이고 있습니다.`;
+                } else if (dataLen >= 2) {
+                    const last = safeNum(currentViewData[dataLen-1].box);
+                    const prev = safeNum(currentViewData[dataLen-2].box);
+                    const diffRatio = (((last - prev) / (prev || 1)) * 100).toFixed(1);
+                    const trendWord = diffRatio > 0 ? `<span class="text-rose-600 font-extrabold">증가(▲${diffRatio}%)</span>` : `<span class="text-blue-600 font-extrabold">감소(▼${Math.abs(diffRatio)}%)</span>`;
+                    trendMsg = `전일 대비 물동량은 ${trendWord} 하였습니다.`;
+                }
+
+                // 주말/평일 편차 분석
+                let weekendBox = 0, weekendCnt = 0, weekdayBox = 0, weekdayCnt = 0;
+                currentViewData.forEach(d => {
+                    const day = new Date(d.date).getDay();
+                    if (day === 0 || day === 6) { weekendBox += safeNum(d.box); weekendCnt++; }
+                    else { weekdayBox += safeNum(d.box); weekdayCnt++; }
+                });
+                const wkAvg = weekendCnt ? (weekendBox/weekendCnt) : 0;
+                const wdAvg = weekdayCnt ? (weekdayBox/weekdayCnt) : 0;
+                let dayMsg = '';
+                if (wkAvg > wdAvg * 1.1) dayMsg = "특히 주말(토/일) 물동량 증가폭이 평일 대비 두드러지는 패턴이 확인됩니다.";
+                else if (wdAvg > wkAvg * 1.1) dayMsg = "주말보다는 평일에 배송 물량이 집중되는 경향을 보이고 있습니다.";
+
+                // 3회차 배차 비중 분석
+                const r1 = currentViewData.reduce((sum, d) => sum + safeNum(d.r1House), 0);
+                const r3 = currentViewData.reduce((sum, d) => sum + safeNum(d.r3House), 0);
+                const r3Ratio = ((r3 / (r1 + r3 || 1)) * 100).toFixed(1);
+                let r3Msg = `전체 공급 비중 중 3회차 비율은 <strong class="text-indigo-900">${r3Ratio}%</strong> 수준으로, `;
+                if (r3Ratio > 35) r3Msg += "야간/심야 시간대 물량 집중 현상이 발생 중이므로 추가 차량 확보 전략이 필요해 보입니다.";
+                else r3Msg += "현재 주간 및 야간 물량이 비교적 안정적인 배차 밸런스를 유지 중입니다.";
+
+                // 특이사항 자동 감지 (평균 대비 30% 이상 증가한 날)
+                let maxD = currentViewData[0];
+                currentViewData.forEach(d => { if(safeNum(d.box) > safeNum(maxD.box)) maxD = d; });
+                let anomalyMsg = '';
+                if (safeNum(maxD.box) > avgBox * 1.3) {
+                    anomalyMsg = `<p class="flex items-start gap-2 pt-1"><span class="shrink-0 text-rose-500">🚨</span> <span><strong>특이사항 감지:</strong> ${maxD.date}에 물량이 평시 대비 크게 급증(<strong class="text-rose-600">${safeNum(maxD.box).toLocaleString()}건</strong>)한 특이사항이 감지되었습니다. 일시적 이벤트 또는 프로모션 영향 여부를 점검해 주세요.</span></p>`;
+                }
+
+                html += `<p class="flex items-start gap-2"><span class="shrink-0 text-blue-500">📈</span> <span>현재 추세 기준 이달 예상 배송건수는 <strong>약 ${estEndBox.toLocaleString()}건</strong> 수준으로 전망되며, ${trendMsg} ${dayMsg}</span></p>`;
+                html += `<p class="flex items-start gap-2"><span class="shrink-0 text-purple-500">🔄</span> <span>${r3Msg}</span></p>`;
+                if(anomalyMsg) html += anomalyMsg;
+
+            } else if (currentNav === 'MONTHLY_KPI' || currentNav === 'WEEKLY_KPI') {
+                const unit = currentNav === 'MONTHLY_KPI' ? '월' : '주';
+                
+                let trendMsg = '';
+                if (dataLen >= 2) {
+                    const last = safeNum(currentViewData[dataLen-1].box);
+                    const prev = safeNum(currentViewData[dataLen-2].box);
+                    const diffRatio = (((last - prev) / (prev || 1)) * 100).toFixed(1);
+                    const trendWord = diffRatio > 0 ? `<span class="text-rose-600 font-extrabold">증가(▲${diffRatio}%)</span>` : `<span class="text-blue-600 font-extrabold">감소(▼${Math.abs(diffRatio)}%)</span>`;
+                    trendMsg = `최근 기준 ${unit}의 총 물동량은 직전 ${unit} 대비 ${trendWord} 추세를 보입니다.`;
+                } else {
+                    trendMsg = `현재 1개 ${unit}의 데이터만 집계되어 직전 비교분석이 보류되었습니다.`;
+                }
+
+                const r1 = currentViewData.reduce((sum, d) => sum + safeNum(d.r1House), 0);
+                const r3 = currentViewData.reduce((sum, d) => sum + safeNum(d.r3House), 0);
+                const r3Ratio = ((r3 / (r1 + r3 || 1)) * 100).toFixed(1);
+
+                html += `<p class="flex items-start gap-2"><span class="shrink-0 text-blue-500">📊</span> <span>기간 누적 합계 물동량은 <strong>${tBox.toLocaleString()}건</strong>이며, ${trendMsg}</span></p>`;
+                html += `<p class="flex items-start gap-2"><span class="shrink-0 text-purple-500">🔄</span> <span>조회 기간 전체의 3회차 공급 평균 비중은 <strong>${r3Ratio}%</strong>를 기록했습니다.</span></p>`;
+            }
+
+            aiBox.innerHTML = html;
         }
 
         function updateDashboard() {
@@ -863,6 +947,7 @@
 
             if (viewData.length === 0) {
                 mainTbody.innerHTML = `<tr><td colspan="${isAggr?18:19}" class="p-6 md:p-8 text-center text-slate-400">조회 범위 내 데이터가 없습니다.</td></tr>`;
+                generateAIReport(); // 호출
                 return;
             }
 
@@ -962,6 +1047,9 @@
                 tr += `</tr>`;
                 mainTbody.innerHTML += tr;
             });
+            
+            // 💡 데이터 렌더링 완료 후 AI 자동 분석 트리거
+            generateAIReport();
         }
 
         function downloadExcel() {
