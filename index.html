@@ -40,6 +40,16 @@
         
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 💡 KPI 카드 크기 미세 조절을 위한 커스텀 그리드 (PC 화면 전용) */
+        @media (min-width: 1280px) {
+            .kpi-grid-custom {
+                display: grid;
+                /* 왼쪽부터 1~8번 카드의 비율 (1fr = 기본 1칸 크기) */
+                grid-template-columns: 1.4fr 1.4fr 1.1fr 1fr 1fr 1fr 1fr 1.2fr;
+                gap: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col md:flex-row h-screen overflow-hidden">
@@ -97,7 +107,7 @@
         <div id="dashboard-wrapper" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             
             <div id="dashboard-view" class="space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-[1.4fr_1.4fr_1.1fr_1fr_1fr_1fr_1fr_1.2fr] gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 kpi-grid-custom">
                     
                     <div class="kpi-card p-4 md:p-5 rounded-2xl relative overflow-hidden flex flex-col justify-center" style="border-top-color: #64748b;">
                         <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-slate-100 rounded-bl-full"></div>
@@ -143,7 +153,7 @@
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
                     </div>
                     
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-between" style="border-top-color: #ef4444;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-center" style="border-top-color: #ef4444;">
                         <div>
                             <p class="text-[9px] md:text-[10px] xl:text-[11px] font-bold text-slate-500 flex flex-wrap justify-between items-center gap-1">
                                 지연배송율 <span id="kpi-success" class="text-[8px] md:text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 whitespace-nowrap"></span>
@@ -266,7 +276,7 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2 md:gap-3">
                             <div>
-                                <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">투입 대수</label>
+                                <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">대수</label>
                                 <input type="number" id="r-count" class="w-full border border-slate-200 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-slate-800 outline-none" placeholder="0대">
                             </div>
                             <div>
@@ -292,11 +302,12 @@
                             <h3 class="text-sm md:text-base font-bold text-slate-800">📊 월별 정산 요약표</h3>
                         </div>
                         <div class="overflow-x-auto rounded-xl border border-slate-200 max-h-[250px] overflow-y-auto">
-                            <table class="w-full text-center border-collapse whitespace-nowrap min-w-[400px]">
+                            <table class="w-full text-center border-collapse whitespace-nowrap min-w-[500px]">
                                 <thead class="sticky top-0 bg-slate-50 z-10 shadow-sm">
                                     <tr class="text-slate-500 font-bold border-b border-slate-200 text-[10px] md:text-[11px] uppercase tracking-wider">
                                         <th class="p-2 md:p-3 text-center">귀속월</th>
-                                        <th class="p-2 md:p-3 text-center">총 투입대수</th>
+                                        <th class="p-2 md:p-3 text-center">임대 대수</th>
+                                        <th class="p-2 md:p-3 text-center">지입 대수</th>
                                         <th class="p-2 md:p-3 text-center text-rose-500">총 공제/오류금액</th>
                                         <th class="p-2 md:p-3 text-center text-emerald-600">월별 최종 수익</th>
                                     </tr>
@@ -317,7 +328,7 @@
                                     <tr class="text-slate-500 font-bold border-b border-slate-200 text-[10px] md:text-[11px] uppercase tracking-wider">
                                         <th class="p-2 md:p-3 text-center">귀속월</th>
                                         <th class="p-2 md:p-3 text-center">항목</th>
-                                        <th class="p-2 md:p-3 text-center">투입대수</th>
+                                        <th class="p-2 md:p-3 text-center">대수</th>
                                         <th class="p-2 md:p-3 text-center">임대료(단가)</th>
                                         <th class="p-2 md:p-3 text-center">지입료(단가)</th>
                                         <th class="p-2 md:p-3 text-center text-rose-500">공제오류금</th>
@@ -620,6 +631,7 @@
             }
         }
 
+        // 💡 수정된 부분: 요약표 렌더링 로직 (임대 대수 / 지입 대수 자동 분류)
         function renderRentalTable() {
             const tbody = document.getElementById('rentalTableBody');
             const sumBody = document.getElementById('rentalSummaryBody');
@@ -628,6 +640,7 @@
 
             rentalDB.sort((a,b) => new Date(b.month) - new Date(a.month)); 
 
+            // 상세 대장 렌더링
             rentalDB.forEach(r => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
@@ -645,10 +658,20 @@
                     </tr>`;
             });
 
+            // 💡 요약표 렌더링을 위한 데이터 자동 분류 로직
             const summary = {};
             rentalDB.forEach(r => {
-                if(!summary[r.month]) summary[r.month] = { count: 0, deduction: 0, total: 0 };
-                summary[r.month].count += safeNum(r.count);
+                if(!summary[r.month]) summary[r.month] = { rentCount: 0, jiipCount: 0, deduction: 0, total: 0 };
+                
+                // 항목명에 '임대차'가 포함되어 있으면 임대 대수로 누적
+                if (r.category && r.category.includes('임대차')) {
+                    summary[r.month].rentCount += safeNum(r.count);
+                } 
+                // 항목명에 '지입차'가 포함되어 있으면 지입 대수로 누적
+                else if (r.category && r.category.includes('지입차')) {
+                    summary[r.month].jiipCount += safeNum(r.count);
+                }
+                
                 summary[r.month].deduction += safeNum(r.deduction);
                 summary[r.month].total += safeNum(r.total);
             });
@@ -656,14 +679,15 @@
             const sortedMonths = Object.keys(summary).sort((a,b) => new Date(b) - new Date(a)); 
 
             if(sortedMonths.length === 0) {
-                sumBody.innerHTML = `<tr><td colspan="4" class="p-4 md:p-6 text-center text-slate-400">등록된 정산 내역이 없습니다.</td></tr>`;
+                sumBody.innerHTML = `<tr><td colspan="5" class="p-4 md:p-6 text-center text-slate-400">등록된 정산 내역이 없습니다.</td></tr>`;
             } else {
                 sortedMonths.forEach(m => {
                     const s = summary[m];
                     sumBody.innerHTML += `
                         <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                             <td class="p-2 md:p-3 text-center font-extrabold text-blue-700">${m}</td>
-                            <td class="p-2 md:p-3 text-center font-bold text-slate-800">${s.count}대</td>
+                            <td class="p-2 md:p-3 text-center font-bold text-slate-800">${s.rentCount}대</td>
+                            <td class="p-2 md:p-3 text-center font-bold text-slate-800">${s.jiipCount}대</td>
                             <td class="p-2 md:p-3 text-center font-bold text-rose-600">${s.deduction.toLocaleString()}원</td>
                             <td class="p-2 md:p-3 text-center font-black text-emerald-600 bg-emerald-50/40">${s.total.toLocaleString()}원</td>
                         </tr>
