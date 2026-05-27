@@ -102,7 +102,7 @@
         <div id="dashboard-wrapper" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             
             <div id="dashboard-view" class="space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-12 gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-11 gap-3">
                     <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #64748b;">
                         <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-slate-100 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">총 정산 매출액</p>
@@ -140,10 +140,10 @@
                         <p id="kpi-single" class="text-lg md:text-xl xl:text-2xl font-extrabold text-cyan-600 mt-1.5 truncate">0%</p>
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-2 flex flex-col justify-between" style="border-top-color: #ef4444;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1 flex flex-col justify-between" style="border-top-color: #ef4444;">
                         <div>
-                            <p class="text-[9px] md:text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider flex justify-between items-center truncate">
-                                지연배송율 <span id="kpi-success" class="text-[8px] md:text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 ml-1"></span>
+                            <p class="text-[9px] md:text-[10px] xl:text-[11px] font-bold text-slate-500 flex flex-wrap justify-between items-center gap-1">
+                                지연배송율 <span id="kpi-success" class="text-[8px] md:text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 whitespace-nowrap"></span>
                             </p>
                             <p id="kpi-delay" class="text-lg md:text-xl xl:text-2xl font-black text-slate-800 mt-1.5 truncate">0%</p>
                         </div>
@@ -283,13 +283,13 @@
                         <table class="w-full text-center border-collapse whitespace-nowrap min-w-[700px]">
                             <thead class="sticky top-0 bg-slate-50 z-10 shadow-sm">
                                 <tr class="text-slate-500 font-bold border-b border-slate-200 text-[10px] md:text-[11px] uppercase tracking-wider">
-                                    <th class="p-2 md:p-3 text-left">귀속월</th>
-                                    <th class="p-2 md:p-3 text-left">항목</th>
-                                    <th class="p-2 md:p-3">투입대수</th>
-                                    <th class="p-2 md:p-3">임대료(단가)</th>
-                                    <th class="p-2 md:p-3">지입료(단가)</th>
-                                    <th class="p-2 md:p-3 text-rose-500">공제오류금</th>
-                                    <th class="p-2 md:p-3 text-emerald-600 text-right">최종수익</th>
+                                    <th class="p-2 md:p-3 text-center">귀속월</th>
+                                    <th class="p-2 md:p-3 text-center">항목</th>
+                                    <th class="p-2 md:p-3 text-center">투입대수</th>
+                                    <th class="p-2 md:p-3 text-center">임대료(단가)</th>
+                                    <th class="p-2 md:p-3 text-center">지입료(단가)</th>
+                                    <th class="p-2 md:p-3 text-center text-rose-500">공제오류금</th>
+                                    <th class="p-2 md:p-3 text-center text-emerald-600">최종수익</th>
                                     <th class="p-2 md:p-3 text-center">관리</th>
                                 </tr>
                             </thead>
@@ -596,13 +596,13 @@
             rentalDB.forEach(r => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-2 md:p-3 text-left font-bold text-blue-700">${r.month}</td>
-                        <td class="p-2 md:p-3 text-left font-bold text-slate-700">${r.category}</td>
-                        <td class="p-2 md:p-3 font-bold">${r.count}대</td>
-                        <td class="p-2 md:p-3">${r.rentFee.toLocaleString()}</td>
-                        <td class="p-2 md:p-3">${r.jiipFee.toLocaleString()}</td>
-                        <td class="p-2 md:p-3 font-bold text-rose-600">${r.deduction.toLocaleString()}</td>
-                        <td class="p-2 md:p-3 font-black text-emerald-600 text-right bg-emerald-50/40">${r.total.toLocaleString()}원</td>
+                        <td class="p-2 md:p-3 text-center font-bold text-blue-700">${r.month}</td>
+                        <td class="p-2 md:p-3 text-center font-bold text-slate-700">${r.category}</td>
+                        <td class="p-2 md:p-3 text-center font-bold">${r.count}대</td>
+                        <td class="p-2 md:p-3 text-center">${r.rentFee.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 text-center">${r.jiipFee.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 text-center font-bold text-rose-600">${r.deduction.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 text-center font-black text-emerald-600 bg-emerald-50/40">${r.total.toLocaleString()}원</td>
                         <td class="p-2 md:p-3 text-center border-l border-slate-100">
                             <button onclick="editRentalRecord('${r.id}')" class="text-blue-500 mr-2">수정</button>
                             <button onclick="deleteRentalRecord('${r.id}')" class="text-rose-500">삭제</button>
@@ -772,26 +772,26 @@
 
             let thead = `
                 <thead><tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 text-[10px] uppercase tracking-wider">
-                    <th class="p-2 md:p-3 text-left w-24">구분/일자</th>
-                    <th class="p-2 md:p-3 text-slate-800">물동량</th>
-                    <th class="p-2 md:p-3">가구수</th>
-                    <th class="p-2 md:p-3 border-l border-slate-200 text-blue-600">총대수</th>
-                    <th class="p-2 md:p-3 bg-slate-100/50">지입</th>
-                    <th class="p-2 md:p-3 bg-slate-100/50 border-r border-slate-200 text-amber-600">용차</th>
-                    <th class="p-2 md:p-3 text-cyan-600">생산성</th>
+                    <th class="p-2 md:p-3 text-center w-24">구분/일자</th>
+                    <th class="p-2 md:p-3 text-center text-slate-800">물동량</th>
+                    <th class="p-2 md:p-3 text-center">가구수</th>
+                    <th class="p-2 md:p-3 text-center border-l border-slate-200 text-blue-600">총대수</th>
+                    <th class="p-2 md:p-3 text-center bg-slate-100/50">지입</th>
+                    <th class="p-2 md:p-3 text-center bg-slate-100/50 border-r border-slate-200 text-amber-600">용차</th>
+                    <th class="p-2 md:p-3 text-center text-cyan-600">생산성</th>
                     
-                    <th class="p-2 md:p-3 bg-slate-50/50 border-l border-slate-200">1차 가구</th>
-                    <th class="p-2 md:p-3 bg-slate-50/50">1차 배차</th>
-                    <th class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400">1차 단회</th>
-                    <th class="p-2 md:p-3 bg-indigo-50/30 text-slate-700">3차 가구</th>
-                    <th class="p-2 md:p-3 bg-indigo-50/30 text-slate-700">3차 배차</th>
-                    <th class="p-2 md:p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600">3차 단회</th>
+                    <th class="p-2 md:p-3 text-center bg-slate-50/50 border-l border-slate-200">1차 가구</th>
+                    <th class="p-2 md:p-3 text-center bg-slate-50/50">1차 배차</th>
+                    <th class="p-2 md:p-3 text-center bg-slate-50/50 border-r border-slate-200 text-indigo-400">1차 단회</th>
+                    <th class="p-2 md:p-3 text-center bg-indigo-50/30 text-slate-700">3차 가구</th>
+                    <th class="p-2 md:p-3 text-center bg-indigo-50/30 text-slate-700">3차 배차</th>
+                    <th class="p-2 md:p-3 text-center bg-indigo-50/30 border-r border-slate-200 text-cyan-600">3차 단회</th>
                     
-                    <th class="p-2 md:p-3">간선막차</th>
-                    <th class="p-2 md:p-3">최종출차</th>
-                    <th class="p-2 md:p-3 text-rose-600">지연배송율</th>
-                    <th class="p-2 md:p-3 text-purple-600">점착/BOX</th>
-                    <th class="p-2 md:p-3 text-emerald-600 text-right">매출액(원)</th>
+                    <th class="p-2 md:p-3 text-center">간선막차</th>
+                    <th class="p-2 md:p-3 text-center">최종출차</th>
+                    <th class="p-2 md:p-3 text-center text-rose-600">지연배송율</th>
+                    <th class="p-2 md:p-3 text-center text-purple-600">점착/BOX</th>
+                    <th class="p-2 md:p-3 text-center text-emerald-600">매출액(원)</th>
                     ${!isAggr ? '<th class="p-2 md:p-3 text-center border-l border-slate-200">관리</th>' : ''}
                 </tr></thead><tbody id="mainTbody" class="divide-y divide-slate-100 text-slate-600 text-[10px] md:text-[11px] font-medium"></tbody>`;
             
@@ -799,7 +799,7 @@
             const mainTbody = document.getElementById('mainTbody');
 
             if (viewData.length === 0) {
-                mainTbody.innerHTML = `<tr><td colspan="${isAggr?18:19}" class="p-6 md:p-8 text-slate-400">조회 범위 내 데이터가 없습니다.</td></tr>`;
+                mainTbody.innerHTML = `<tr><td colspan="${isAggr?18:19}" class="p-6 md:p-8 text-center text-slate-400">조회 범위 내 데이터가 없습니다.</td></tr>`;
                 return;
             }
 
@@ -815,7 +815,7 @@
 
                 let cellRevHtml = '';
                 
-                // 💡 주별 KPI에서는 임대 데이터를 제외하도록 조건문(MONTHLY_KPI) 수정 
+                // 💡 주별 KPI에서는 임대 데이터를 완전 제외하고 물류 매출만 보여주도록 처리
                 if (isAggr && currentNav === 'MONTHLY_KPI') {
                     let monthlyRent = 0;
                     rentalDB.forEach(rent => { if(rent.month === r.key) monthlyRent += rent.total; }); 
@@ -824,13 +824,14 @@
                     const mTotal = mKurly + monthlyRent;
                     
                     cellRevHtml = `
-                        <div class="text-right leading-tight">
+                        <div class="text-center leading-tight">
                             <span class="text-emerald-600 font-bold text-[11px] md:text-[12px]">${mTotal.toLocaleString()}</span><br>
                             <span class="text-[8px] md:text-[9px] text-slate-400 font-normal">물류: ${mKurly.toLocaleString()}</span><br>
                             <span class="text-[8px] md:text-[9px] text-blue-500 font-bold">임대: ${monthlyRent.toLocaleString()}</span>
                         </div>`;
                 } else {
-                    cellRevHtml = `<span class="font-bold text-emerald-600 text-[11px] md:text-[12px]">${(r.box*UNIT_REVENUE).toLocaleString()}</span>`;
+                    // 일별, 주별 대장에서는 오직 순수 물류 매출만 깔끔하게 노출
+                    cellRevHtml = `<div class="text-center"><span class="font-bold text-emerald-600 text-[11px] md:text-[12px]">${(r.box*UNIT_REVENUE).toLocaleString()}</span></div>`;
                 }
 
                 let tr = `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
@@ -841,54 +842,54 @@
                     const avgDrop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
                     
                     tr += `
-                        <td class="p-2 md:p-3 text-left font-bold text-slate-800 align-middle">${r.label}</td>
-                        <td class="p-2 md:p-3 font-black text-slate-900 leading-snug align-middle">${formatCell(r.box, avgBox)}</td>
-                        <td class="p-2 md:p-3 font-bold leading-snug align-middle">${formatCell(ch, Math.round(ch/count))}</td>
-                        <td class="p-2 md:p-3 font-bold border-l border-slate-200 text-blue-600 leading-snug align-middle">${formatCell(cv, avgCv)}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50 leading-snug align-middle">${formatCell(r.owned, Math.round(r.owned/count))}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600 leading-snug align-middle">${formatCell(r.hired, Math.round(r.hired/count))}</td>
-                        <td class="p-2 md:p-3 font-bold text-cyan-600 align-middle">${avgCp}</td>
+                        <td class="p-2 md:p-3 text-center font-bold text-slate-800 align-middle">${r.label}</td>
+                        <td class="p-2 md:p-3 text-center font-black text-slate-900 leading-snug align-middle">${formatCell(r.box, avgBox)}</td>
+                        <td class="p-2 md:p-3 text-center font-bold leading-snug align-middle">${formatCell(ch, Math.round(ch/count))}</td>
+                        <td class="p-2 md:p-3 text-center font-bold border-l border-slate-200 text-blue-600 leading-snug align-middle">${formatCell(cv, avgCv)}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 leading-snug align-middle">${formatCell(r.owned, Math.round(r.owned/count))}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 border-r border-slate-200 text-amber-600 leading-snug align-middle">${formatCell(r.hired, Math.round(r.hired/count))}</td>
+                        <td class="p-2 md:p-3 text-center font-bold text-cyan-600 align-middle">${avgCp}</td>
                         
-                        <td class="p-2 md:p-3 bg-slate-50/50 border-l border-slate-200 leading-snug align-middle">${formatCell(r.r1House, Math.round(r.r1House/count))}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50 leading-snug align-middle">${formatCell(r.r1Veh, (r.r1Veh/count).toFixed(1))}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400 leading-snug align-middle">${formatCell(r.r1Sin, (r.r1Sin/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 border-l border-slate-200 leading-snug align-middle">${formatCell(r.r1House, Math.round(r.r1House/count))}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 leading-snug align-middle">${formatCell(r.r1Veh, (r.r1Veh/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 border-r border-slate-200 text-indigo-400 leading-snug align-middle">${formatCell(r.r1Sin, (r.r1Sin/count).toFixed(1))}</td>
                         
-                        <td class="p-2 md:p-3 bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3House, Math.round(r.r3House/count))}</td>
-                        <td class="p-2 md:p-3 bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3Veh, (r.r3Veh/count).toFixed(1))}</td>
-                        <td class="p-2 md:p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600 leading-snug align-middle">${formatCell(r.r3Sin, (r.r3Sin/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 text-center bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3House, Math.round(r.r3House/count))}</td>
+                        <td class="p-2 md:p-3 text-center bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3Veh, (r.r3Veh/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 text-center bg-indigo-50/30 border-r border-slate-200 text-cyan-600 leading-snug align-middle">${formatCell(r.r3Sin, (r.r3Sin/count).toFixed(1))}</td>
                         
-                        <td class="p-2 md:p-3 align-middle text-slate-500">${r.trunkCount>0 ? minsToTime(r.timeTrunkMins/r.trunkCount) : '-'}</td>
-                        <td class="p-2 md:p-3 align-middle text-slate-500">${r.departCount>0 ? minsToTime(r.timeDepartMins/r.departCount) : '-'}</td>
-                        <td class="p-2 md:p-3 align-middle"><span class="${delayClass}">${rawDelay.toFixed(2)}%</span></td>
-                        <td class="p-2 md:p-3 font-bold text-purple-600 align-middle">${avgDrop}</td>
-                        <td class="p-2 md:p-3 align-middle border-l border-slate-100">${cellRevHtml}</td>
+                        <td class="p-2 md:p-3 text-center align-middle text-slate-500">${r.trunkCount>0 ? minsToTime(r.timeTrunkMins/r.trunkCount) : '-'}</td>
+                        <td class="p-2 md:p-3 text-center align-middle text-slate-500">${r.departCount>0 ? minsToTime(r.timeDepartMins/r.departCount) : '-'}</td>
+                        <td class="p-2 md:p-3 text-center align-middle"><span class="${delayClass}">${rawDelay.toFixed(2)}%</span></td>
+                        <td class="p-2 md:p-3 text-center font-bold text-purple-600 align-middle">${avgDrop}</td>
+                        <td class="p-2 md:p-3 text-center align-middle border-l border-slate-100">${cellRevHtml}</td>
                     `;
                 } else {
                     const cp = cv === 0 ? 0 : (r.box/cv).toFixed(1);
                     const drop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
                     
                     tr += `
-                        <td class="p-2 md:p-3 text-left font-bold text-slate-800">${r.date}</td>
-                        <td class="p-2 md:p-3 font-black text-slate-900">${r.box.toLocaleString()}</td>
-                        <td class="p-2 md:p-3 font-bold">${ch.toLocaleString()}</td>
-                        <td class="p-2 md:p-3 font-bold border-l border-slate-200 text-blue-600">${cv}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50">${r.owned}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600">${r.hired}</td>
-                        <td class="p-2 md:p-3 font-bold text-cyan-600">${cp}</td>
+                        <td class="p-2 md:p-3 text-center font-bold text-slate-800">${r.date}</td>
+                        <td class="p-2 md:p-3 text-center font-black text-slate-900">${r.box.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 text-center font-bold">${ch.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 text-center font-bold border-l border-slate-200 text-blue-600">${cv}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50">${r.owned}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 border-r border-slate-200 text-amber-600">${r.hired}</td>
+                        <td class="p-2 md:p-3 text-center font-bold text-cyan-600">${cp}</td>
                         
-                        <td class="p-2 md:p-3 bg-slate-50/50 border-l border-slate-200">${r.r1House.toLocaleString()}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50">${r.r1Veh}</td>
-                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400">${r.r1Sin}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 border-l border-slate-200">${r.r1House.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50">${r.r1Veh}</td>
+                        <td class="p-2 md:p-3 text-center bg-slate-50/50 border-r border-slate-200 text-indigo-400">${r.r1Sin}</td>
                         
-                        <td class="p-2 md:p-3 bg-indigo-50/30">${r.r3House.toLocaleString()}</td>
-                        <td class="p-2 md:p-3 bg-indigo-50/30">${r.r3Veh}</td>
-                        <td class="p-2 md:p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600">${r.r3Sin}</td>
+                        <td class="p-2 md:p-3 text-center bg-indigo-50/30">${r.r3House.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 text-center bg-indigo-50/30">${r.r3Veh}</td>
+                        <td class="p-2 md:p-3 text-center bg-indigo-50/30 border-r border-slate-200 text-cyan-600">${r.r3Sin}</td>
                         
-                        <td class="p-2 md:p-3 text-slate-500">${r.timeTrunk || '-'}</td>
-                        <td class="p-2 md:p-3 text-slate-500">${r.timeDepart || '-'}</td>
-                        <td class="p-2 md:p-3"><span class="${delayClass}">${rawDelay}%</span></td>
-                        <td class="p-2 md:p-3 font-bold text-purple-600">${drop}</td>
-                        <td class="p-2 md:p-3 border-l border-slate-100">${cellRevHtml}</td>
+                        <td class="p-2 md:p-3 text-center text-slate-500">${r.timeTrunk || '-'}</td>
+                        <td class="p-2 md:p-3 text-center text-slate-500">${r.timeDepart || '-'}</td>
+                        <td class="p-2 md:p-3 text-center"><span class="${delayClass}">${rawDelay}%</span></td>
+                        <td class="p-2 md:p-3 text-center font-bold text-purple-600">${drop}</td>
+                        <td class="p-2 md:p-3 text-center border-l border-slate-100">${cellRevHtml}</td>
                         <td class="p-2 md:p-3 text-center border-l border-slate-200">
                             <div class="flex items-center justify-center gap-1.5 md:gap-2">
                                 <button onclick="editLogRecord('${r.date}')" class="text-blue-500 hover:text-blue-700" title="수정"><svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
