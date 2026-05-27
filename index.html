@@ -102,18 +102,18 @@
         <div id="dashboard-wrapper" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             
             <div id="dashboard-view" class="space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-11 gap-3">
+                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-12 gap-3">
                     <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #64748b;">
                         <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-slate-100 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">총 정산 매출액</p>
                         <p id="kpi-revenue" class="text-lg md:text-xl xl:text-[1.55rem] font-black text-slate-800 mt-2 tracking-tight break-all whitespace-normal">0원</p>
-                        <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 font-medium">물류매출 + 임대수익</p>
+                        <p id="kpi-revenue-desc" class="text-[9px] md:text-[10px] text-slate-400 mt-2 font-medium">물류매출 + 임대수익</p>
                     </div>
                     <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #10b981;">
                         <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-emerald-50 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">영업 순이익</p>
                         <p id="kpi-profit" class="text-lg md:text-xl xl:text-[1.55rem] font-black text-emerald-600 mt-2 tracking-tight break-all whitespace-normal">0원</p>
-                        <p class="text-[9px] md:text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-1.5 md:px-2 py-0.5 rounded border border-emerald-100">마진(2.99%) + 임대수익</p>
+                        <p id="kpi-profit-desc" class="text-[9px] md:text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-1.5 md:px-2 py-0.5 rounded border border-emerald-100">마진(2.99%) + 임대수익</p>
                     </div>
                     <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-2" style="border-top-color: #3b82f6;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">누적 물동량</p>
@@ -140,7 +140,7 @@
                         <p id="kpi-single" class="text-lg md:text-xl xl:text-2xl font-extrabold text-cyan-600 mt-1.5 truncate">0%</p>
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1 flex flex-col justify-between" style="border-top-color: #ef4444;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-2 flex flex-col justify-between" style="border-top-color: #ef4444;">
                         <div>
                             <p class="text-[9px] md:text-[10px] xl:text-[11px] font-bold text-slate-500 flex flex-wrap justify-between items-center gap-1">
                                 지연배송율 <span id="kpi-success" class="text-[8px] md:text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 whitespace-nowrap"></span>
@@ -557,7 +557,6 @@
             } catch (e) { alert("저장 실패"); showLoading(false); }
         }
 
-
         let logisticsDB = [];
         let rentalDB = [];
 
@@ -651,13 +650,24 @@
             const kurlyRev = tBox * UNIT_REVENUE;
             const kurlyProfit = tBox * UNIT_PROFIT;
             
+            // 💡 월별 조회일 때만 임대 데이터를 불러와 합산
             let totalRentalAmt = 0;
-            if (currentNav === 'DAILY_DETAIL') {
-                rentalDB.forEach(r => { if(r.month.substring(5,7) === currentSelectedMonth) totalRentalAmt += r.total; });
-            } else {
+            let descRev = "순수 물류 매출액";
+            let descProf = "마진(2.99%) 단독";
+
+            if (currentNav === 'MONTHLY_KPI') {
                 rentalDB.forEach(r => totalRentalAmt += r.total);
+                descRev = "물류매출 + 임대수익";
+                descProf = "마진(2.99%) + 임대수익";
             }
 
+            safeUpdateText('kpi-revenue-desc', descRev);
+            safeUpdateText('kpi-profit-desc', descProf);
+
+            safeUpdateText('kpi-revenue', (kurlyRev + totalRentalAmt).toLocaleString() + '원');
+            safeUpdateText('kpi-profit', (kurlyProfit + totalRentalAmt).toLocaleString() + '원');
+            safeUpdateText('kpi-box', tBox.toLocaleString());
+            
             const avgProd = tVeh === 0 ? 0 : (tBox / tVeh).toFixed(1);
             const avgHired = tVeh === 0 ? 0 : ((tHired / tVeh) * 100).toFixed(1);
             const avgDelay = filteredDB.length === 0 ? 0 : (tDelaySum / rCount).toFixed(2);
@@ -666,9 +676,6 @@
             const singleRatio = totalRoundVeh === 0 ? 0 : (((tR1Sin + tR3Sin) / totalRoundVeh) * 100).toFixed(1);
             const successRate = (100 - avgDelay).toFixed(2);
 
-            safeUpdateText('kpi-revenue', (kurlyRev + totalRentalAmt).toLocaleString() + '원');
-            safeUpdateText('kpi-profit', (kurlyProfit + totalRentalAmt).toLocaleString() + '원');
-            safeUpdateText('kpi-box', tBox.toLocaleString());
             safeUpdateText('kpi-prod', avgProd);
             safeUpdateText('kpi-drop-size', dropSizeOverall + '개');
             safeUpdateText('kpi-hired', avgHired + '%');
@@ -815,7 +822,6 @@
 
                 let cellRevHtml = '';
                 
-                // 💡 주별 KPI에서는 임대 데이터를 완전 제외하고 물류 매출만 보여주도록 처리
                 if (isAggr && currentNav === 'MONTHLY_KPI') {
                     let monthlyRent = 0;
                     rentalDB.forEach(rent => { if(rent.month === r.key) monthlyRent += rent.total; }); 
@@ -830,7 +836,6 @@
                             <span class="text-[8px] md:text-[9px] text-blue-500 font-bold">임대: ${monthlyRent.toLocaleString()}</span>
                         </div>`;
                 } else {
-                    // 일별, 주별 대장에서는 오직 순수 물류 매출만 깔끔하게 노출
                     cellRevHtml = `<div class="text-center"><span class="font-bold text-emerald-600 text-[11px] md:text-[12px]">${(r.box*UNIT_REVENUE).toLocaleString()}</span></div>`;
                 }
 
