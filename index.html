@@ -11,17 +11,21 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Inter', 'Pretendard', sans-serif; background-color: #f8fafc; color: #0f172a; }
         
-        /* Custom Scrollbar */
+        /* Custom Scrollbar for Main Content */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
+        /* Hide scrollbar for mobile top nav */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
         /* KPI Card Styling */
         .kpi-card { background: #ffffff; border: 1px solid #e2e8f0; border-top-width: 4px; transition: transform 0.2s, box-shadow 0.2s; }
         .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
         
-        /* Sidebar Navigation */
+        /* Sidebar/Top Navigation */
         .nav-item.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); font-weight: 700;}
         .nav-item { color: #64748b; transition: all 0.2s; font-weight: 600;}
         .nav-item:hover:not(.active) { background-color: #f1f5f9; color: #0f172a; }
@@ -38,188 +42,191 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body class="flex flex-col md:flex-row h-screen overflow-hidden">
 
-    <aside class="w-64 bg-white border-r border-slate-200 shadow-sm flex flex-col z-20 shrink-0">
-        <div class="h-20 flex items-center px-6 border-b border-slate-100">
-            <div class="bg-blue-600 p-2 rounded-lg mr-3 shadow-md shadow-blue-500/30">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+    <aside class="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200 shadow-sm flex flex-col z-20 shrink-0">
+        <div class="h-16 md:h-20 flex items-center px-4 md:px-6 border-b border-slate-100 shrink-0">
+            <div class="bg-blue-600 p-1.5 md:p-2 rounded-lg mr-3 shadow-md shadow-blue-500/30">
+                <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012-2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
             </div>
             <div>
-                <h1 class="text-sm font-extrabold text-slate-900 tracking-tight">Horizon Logistics</h1>
-                <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">KPI Management System</p>
+                <h1 class="text-xs md:text-sm font-extrabold text-slate-900 tracking-tight">Horizon Logistics</h1>
+                <p class="text-[8px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest">KPI Management System</p>
             </div>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-            <p class="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">운영 실적 분석</p>
-            <button onclick="setNavView('YEARLY')" id="nav-YEARLY" class="nav-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
-                <span class="text-lg">📊</span> 연간 KPI
+        <nav class="flex md:flex-col flex-1 px-2 md:px-4 py-2 md:py-6 gap-2 md:gap-0 md:space-y-1.5 overflow-x-auto md:overflow-y-auto scrollbar-hide whitespace-nowrap items-center md:items-stretch">
+            
+            <p class="hidden md:block px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 mt-2 md:mt-0">운영 실적 분석</p>
+            
+            <button onclick="setNavView('MONTHLY_KPI')" id="nav-MONTHLY_KPI" class="nav-item active w-auto md:w-full flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-xl text-sm shrink-0">
+                <span class="text-base md:text-lg">📈</span> 월별 KPI
             </button>
-            <button onclick="setNavView('MONTHLY_KPI')" id="nav-MONTHLY_KPI" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
-                <span class="text-lg">📈</span> 월별 KPI
+            <button onclick="setNavView('WEEKLY_KPI')" id="nav-WEEKLY_KPI" class="nav-item w-auto md:w-full flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-xl text-sm shrink-0">
+                <span class="text-base md:text-lg">🗓️</span> 주별 KPI
             </button>
-            <button onclick="setNavView('WEEKLY_KPI')" id="nav-WEEKLY_KPI" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
-                <span class="text-lg">🗓️</span> 주별 KPI
-            </button>
-            <button onclick="setNavView('DAILY_DETAIL')" id="nav-DAILY_DETAIL" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm">
-                <span class="text-lg">📋</span> 일별 상세
+            <button onclick="setNavView('DAILY_DETAIL')" id="nav-DAILY_DETAIL" class="nav-item w-auto md:w-full flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-xl text-sm shrink-0">
+                <span class="text-base md:text-lg">📋</span> 일별 상세
             </button>
             
-            <div class="h-4"></div>
-            <p class="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">수익/정산 관리</p>
-            <button onclick="setNavView('RENTAL_MGMT')" id="nav-RENTAL_MGMT" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm border border-slate-100 bg-slate-50/50">
-                <span class="text-lg">🚙</span> 임대/지입 관리
+            <div class="hidden md:block h-4 shrink-0"></div>
+            <p class="hidden md:block px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 shrink-0">수익/정산 관리</p>
+            
+            <button onclick="setNavView('RENTAL_MGMT')" id="nav-RENTAL_MGMT" class="nav-item w-auto md:w-full flex items-center gap-2 md:gap-3 px-4 py-2 md:py-3 rounded-xl text-sm border border-slate-100 bg-slate-50/50 shrink-0">
+                <span class="text-base md:text-lg">🚙</span> 임대/지입 관리
             </button>
         </nav>
 
-        <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+        <div class="hidden md:block p-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
             <button onclick="downloadExcel()" class="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center transition shadow-sm gap-2">
                 <span>⬇️</span> 현재화면 엑셀 추출
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
-        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 shrink-0">
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
+        <header class="h-16 md:h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 z-10 shrink-0">
             <div class="flex items-center gap-4">
-                <h2 id="currentViewTitle" class="text-xl font-extrabold text-slate-800">연간 KPI 요약 리포트</h2>
+                <h2 id="currentViewTitle" class="text-lg md:text-xl font-extrabold text-slate-800">월별 KPI 요약 리포트</h2>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="fetchDataFromGoogle()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-5 rounded-lg flex items-center transition shadow-md gap-2">
-                    <span id="syncIcon">🔄</span> 최신 DB 동기화
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="downloadExcel()" class="md:hidden bg-white text-slate-600 border border-slate-300 p-2 rounded-lg shadow-sm">
+                    ⬇️
+                </button>
+                <button onclick="fetchDataFromGoogle()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm font-bold py-2 md:py-2.5 px-3 md:px-5 rounded-lg flex items-center transition shadow-md gap-1.5 md:gap-2">
+                    <span id="syncIcon">🔄</span> <span class="hidden md:inline">최신 DB 동기화</span><span class="md:hidden">동기화</span>
                 </button>
             </div>
         </header>
 
-        <div id="dashboard-wrapper" class="flex-1 overflow-y-auto p-8 space-y-6">
+        <div id="dashboard-wrapper" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             
             <div id="dashboard-view" class="space-y-6">
                 <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-10 gap-3">
-                    <div class="kpi-card p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #64748b;">
-                        <div class="absolute top-0 right-0 w-16 h-16 bg-slate-100 rounded-bl-full"></div>
+                    <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #64748b;">
+                        <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-slate-100 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">총 정산 매출액</p>
-                        <p id="kpi-revenue" class="text-xl xl:text-[1.55rem] font-black text-slate-800 mt-2 tracking-tight break-all whitespace-normal">0원</p>
-                        <p class="text-[10px] text-slate-400 mt-2 font-medium">물류매출 + 임대수익 합산</p>
+                        <p id="kpi-revenue" class="text-lg md:text-xl xl:text-[1.55rem] font-black text-slate-800 mt-2 tracking-tight break-all whitespace-normal">0원</p>
+                        <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 font-medium">물류매출 + 임대수익</p>
                     </div>
-                    <div class="kpi-card p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #10b981;">
-                        <div class="absolute top-0 right-0 w-16 h-16 bg-emerald-50 rounded-bl-full"></div>
+                    <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #10b981;">
+                        <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-emerald-50 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">영업 순이익</p>
-                        <p id="kpi-profit" class="text-xl xl:text-[1.55rem] font-black text-emerald-600 mt-2 tracking-tight break-all whitespace-normal">0원</p>
-                        <p class="text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-2 py-0.5 rounded border border-emerald-100">마진(2.99%) + 임대수익</p>
+                        <p id="kpi-profit" class="text-lg md:text-xl xl:text-[1.55rem] font-black text-emerald-600 mt-2 tracking-tight break-all whitespace-normal">0원</p>
+                        <p class="text-[9px] md:text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-1.5 md:px-2 py-0.5 rounded border border-emerald-100">마진(2.99%) + 임대수익</p>
                     </div>
-                    <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #3b82f6;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #3b82f6;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">누적 물동량</p>
-                        <p id="kpi-box" class="text-xl xl:text-2xl font-extrabold text-slate-800 mt-1.5 truncate">0</p>
-                        <p class="text-[10px] text-blue-600 font-bold mt-2 bg-blue-50 inline-block px-1 rounded">전체 출고</p>
+                        <p id="kpi-box" class="text-lg md:text-xl xl:text-2xl font-extrabold text-slate-800 mt-1.5 truncate">0</p>
+                        <p class="text-[9px] md:text-[10px] text-blue-600 font-bold mt-2 bg-blue-50 inline-block px-1 rounded">전체 출고</p>
                     </div>
-                    <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #6366f1;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #6366f1;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">차량당 생산성</p>
-                        <p id="kpi-prod" class="text-xl xl:text-2xl font-extrabold text-indigo-600 mt-1.5 truncate">0</p>
-                        <p class="text-[10px] text-slate-400 mt-2">평균 처리 건수</p>
+                        <p id="kpi-prod" class="text-lg md:text-xl xl:text-2xl font-extrabold text-indigo-600 mt-1.5 truncate">0</p>
+                        <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">평균 처리 건수</p>
                     </div>
-                    <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #8b5cf6;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #8b5cf6;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">박스분포율</p>
-                        <p id="kpi-drop-size" class="text-xl xl:text-2xl font-extrabold text-purple-600 mt-1.5 truncate">0</p>
-                        <p class="text-[10px] text-slate-400 mt-2">점착/BOX</p>
+                        <p id="kpi-drop-size" class="text-lg md:text-xl xl:text-2xl font-extrabold text-purple-600 mt-1.5 truncate">0</p>
+                        <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">점착/BOX</p>
                     </div>
-                    <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #f59e0b;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #f59e0b;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">용차 의존도</p>
-                        <p id="kpi-hired" class="text-xl xl:text-2xl font-extrabold text-amber-600 mt-1.5 truncate">0%</p>
-                        <p class="text-[10px] text-slate-400 mt-2">스팟 차량 비율</p>
+                        <p id="kpi-hired" class="text-lg md:text-xl xl:text-2xl font-extrabold text-amber-600 mt-1.5 truncate">0%</p>
+                        <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">스팟 차량 비율</p>
                     </div>
-                    <div class="kpi-card p-4 rounded-2xl xl:col-span-1" style="border-top-color: #06b6d4;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #06b6d4;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">단회 운행</p>
-                        <p id="kpi-single" class="text-xl xl:text-2xl font-extrabold text-cyan-600 mt-1.5 truncate">0%</p>
-                        <p class="text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
+                        <p id="kpi-single" class="text-lg md:text-xl xl:text-2xl font-extrabold text-cyan-600 mt-1.5 truncate">0%</p>
+                        <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
                     </div>
-                    <div class="kpi-card p-4 rounded-2xl xl:col-span-1 flex flex-col justify-between" style="border-top-color: #ef4444;">
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1 flex flex-col justify-between" style="border-top-color: #ef4444;">
                         <div>
-                            <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider flex justify-between items-center truncate">
-                                지연배송율 <span id="kpi-success" class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 ml-1"></span>
+                            <p class="text-[9px] md:text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider flex justify-between items-center truncate">
+                                지연배송율 <span id="kpi-success" class="text-[8px] md:text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 ml-1"></span>
                             </p>
-                            <p id="kpi-delay" class="text-xl xl:text-2xl font-black text-slate-800 mt-1.5 truncate">0%</p>
+                            <p id="kpi-delay" class="text-lg md:text-xl xl:text-2xl font-black text-slate-800 mt-1.5 truncate">0%</p>
                         </div>
-                        <div class="flex items-center gap-1.5 mt-2 text-[9px] font-bold text-slate-500">
+                        <div class="flex items-center gap-1 mt-2 text-[8px] md:text-[9px] font-bold text-slate-500">
                             <span class="text-rose-600 bg-rose-50 px-1 rounded">>3%</span>
                             <span class="text-amber-500 bg-amber-50 px-1 rounded">>1%</span>
                         </div>
                     </div>
                 </div>
 
-                <div id="chartSection" class="grid grid-cols-1 xl:grid-cols-4 gap-6">
-                    <div class="xl:col-span-3 space-y-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 id="trendChartTitle" class="text-base font-bold text-slate-800">물동량 및 생산성 트렌드</h3>
-                                <div class="flex items-center gap-4 text-xs font-bold text-slate-500">
-                                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-500"></span>물동량(BOX)</span>
-                                    <span class="flex items-center gap-1.5"><span class="w-4 h-1 rounded-full bg-indigo-600"></span>차량당 생산성</span>
+                <div id="chartSection" class="grid grid-cols-1 xl:grid-cols-4 gap-4 md:gap-6">
+                    <div class="xl:col-span-3 space-y-4 md:space-y-6">
+                        <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4 md:mb-6">
+                                <h3 id="trendChartTitle" class="text-sm md:text-base font-bold text-slate-800">물동량 및 생산성 트렌드</h3>
+                                <div class="flex items-center gap-3 md:gap-4 text-[10px] md:text-xs font-bold text-slate-500">
+                                    <span class="flex items-center gap-1 md:gap-1.5"><span class="w-2 md:w-3 h-2 md:h-3 rounded bg-blue-500"></span>물동량(BOX)</span>
+                                    <span class="flex items-center gap-1 md:gap-1.5"><span class="w-3 md:w-4 h-1 rounded-full bg-indigo-600"></span>차량당 생산성</span>
                                 </div>
                             </div>
-                            <div class="h-[280px] w-full"><canvas id="trendChart"></canvas></div>
+                            <div class="h-[220px] md:h-[280px] w-full"><canvas id="trendChart"></canvas></div>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <div class="mb-4">
-                                    <h3 id="scatterChartTitle" class="text-base font-bold text-slate-800">차량 투입 가동 효율</h3>
+                                    <h3 id="scatterChartTitle" class="text-sm md:text-base font-bold text-slate-800">차량 투입 가동 효율</h3>
                                 </div>
-                                <div class="h-[240px] w-full"><canvas id="scatterChart"></canvas></div>
+                                <div class="h-[200px] md:h-[240px] w-full"><canvas id="scatterChart"></canvas></div>
                             </div>
-                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
                                 <div class="mb-4">
-                                    <h3 class="text-base font-bold text-slate-800">회차별 공급 비중 구조</h3>
+                                    <h3 class="text-sm md:text-base font-bold text-slate-800">회차별 공급 비중 구조</h3>
                                 </div>
-                                <div class="h-[240px] w-full"><canvas id="roundChart"></canvas></div>
+                                <div class="h-[200px] md:h-[240px] w-full"><canvas id="roundChart"></canvas></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
-                        <div class="border-b border-slate-100 pb-4 mb-5 flex justify-between items-center">
-                            <h3 id="formPanelTitle" class="text-base font-bold text-slate-800">✍️ 일일 실적 기록</h3>
-                            <button onclick="resetLogForm()" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded font-bold transition">초기화</button>
+                    <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                        <div class="border-b border-slate-100 pb-3 md:pb-4 mb-4 md:mb-5 flex justify-between items-center">
+                            <h3 id="formPanelTitle" class="text-sm md:text-base font-bold text-slate-800">✍️ 일일 실적 기록</h3>
+                            <button onclick="resetLogForm()" class="text-[9px] md:text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-600 px-2 py-1 rounded font-bold transition">초기화</button>
                         </div>
                         
                         <input type="hidden" id="log-form-mode" value="insert">
-                        <div id="dataFormContainer" class="space-y-4">
-                            <div class="grid grid-cols-2 gap-3">
+                        <div id="dataFormContainer" class="space-y-3 md:space-y-4">
+                            <div class="grid grid-cols-2 gap-2 md:gap-3">
                                 <div class="col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">운영 일자 (필수)</label>
-                                    <input type="date" id="i-date" class="w-full border border-slate-200 bg-slate-50 p-2.5 rounded-lg text-sm font-bold text-blue-700">
+                                    <label class="block text-[9px] md:text-[10px] font-bold text-slate-500 mb-1">운영 일자 (필수)</label>
+                                    <input type="date" id="i-date" class="w-full border border-slate-200 bg-slate-50 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-700">
                                 </div>
                                 <div class="col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">당일 총 출고 물동량 (BOX)</label>
-                                    <input type="number" id="i-box" class="w-full border border-blue-200 bg-blue-50 p-2.5 rounded-lg text-sm font-bold text-slate-800" placeholder="0">
+                                    <label class="block text-[9px] md:text-[10px] font-bold text-slate-500 mb-1">당일 총 출고 물동량 (BOX)</label>
+                                    <input type="number" id="i-box" class="w-full border border-blue-200 bg-blue-50 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-slate-800" placeholder="0">
                                 </div>
-                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-slate-500">🚚 마스터 배차</span></div>
-                                <div><label class="block text-[9px] text-slate-400 mb-0.5">지입 정규</label><input type="number" id="i-owned" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div><label class="block text-[9px] text-slate-400 mb-0.5">스팟 용차</label><input type="number" id="i-hired" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-indigo-500">🔄 1회차 라우팅</span></div>
-                                <div><label class="block text-[9px] text-slate-400 mb-0.5">가구수</label><input type="number" id="i-r1-house" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div><label class="block text-[9px] text-slate-400 mb-0.5">배차 대수</label><input type="number" id="i-r1-veh" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div class="col-span-2"><label class="block text-[9px] text-slate-400 mb-0.5">단회 운행</label><input type="number" id="i-r1-sin" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-cyan-500">🔄 3회차 라우팅</span></div>
-                                <div><label class="block text-[9px] text-slate-400 mb-0.5">가구수</label><input type="number" id="i-r3-house" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div><label class="block text-[9px] text-slate-400 mb-0.5">배차 대수</label><input type="number" id="i-r3-veh" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div class="col-span-2"><label class="block text-[9px] text-slate-400 mb-0.5">단회 운행</label><input type="number" id="i-r3-sin" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
-                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[10px] font-extrabold text-slate-500">⏰ 접안 및 품질</span></div>
-                                <div><label class="block text-[9px] text-slate-500 mb-1">간선막차</label><input type="time" id="i-time-trunk" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800"></div>
-                                <div><label class="block text-[9px] text-slate-500 mb-1">최종출차</label><input type="time" id="i-time-depart" class="w-full border border-slate-200 bg-white p-2 rounded-lg text-xs text-slate-800"></div>
+                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[9px] md:text-[10px] font-extrabold text-slate-500">🚚 마스터 배차</span></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">지입 정규</label><input type="number" id="i-owned" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">스팟 용차</label><input type="number" id="i-hired" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[9px] md:text-[10px] font-extrabold text-indigo-500">🔄 1회차 라우팅</span></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">가구수</label><input type="number" id="i-r1-house" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">배차 대수</label><input type="number" id="i-r1-veh" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div class="col-span-2"><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">단회 운행</label><input type="number" id="i-r1-sin" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[9px] md:text-[10px] font-extrabold text-cyan-500">🔄 3회차 라우팅</span></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">가구수</label><input type="number" id="i-r3-house" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">배차 대수</label><input type="number" id="i-r3-veh" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div class="col-span-2"><label class="block text-[8px] md:text-[9px] text-slate-400 mb-0.5">단회 운행</label><input type="number" id="i-r3-sin" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800" placeholder="0"></div>
+                                <div class="col-span-2 pt-2 border-t border-slate-100 mt-1"><span class="text-[9px] md:text-[10px] font-extrabold text-slate-500">⏰ 접안 및 품질</span></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-500 mb-1">간선막차</label><input type="time" id="i-time-trunk" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800"></div>
+                                <div><label class="block text-[8px] md:text-[9px] text-slate-500 mb-1">최종출차</label><input type="time" id="i-time-depart" class="w-full border border-slate-200 bg-white p-1.5 md:p-2 rounded-lg text-xs text-slate-800"></div>
                                 <div class="col-span-2">
-                                    <label class="block text-[10px] font-bold text-slate-500 mb-1">지연배송율 (%)</label>
-                                    <input type="number" step="0.01" id="i-delay" class="w-full border border-rose-200 bg-rose-50 p-2 rounded-lg text-sm font-bold text-rose-600" placeholder="0.00">
+                                    <label class="block text-[9px] md:text-[10px] font-bold text-slate-500 mb-1">지연배송율 (%)</label>
+                                    <input type="number" step="0.01" id="i-delay" class="w-full border border-rose-200 bg-rose-50 p-1.5 md:p-2 rounded-lg text-xs md:text-sm font-bold text-rose-600" placeholder="0.00">
                                 </div>
                             </div>
-                            <button type="button" id="btn-save" onclick="saveLogData()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition mt-2 shadow-md text-sm">실적 저장 및 전송</button>
+                            <button type="button" id="btn-save" onclick="saveLogData()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 md:py-3.5 rounded-xl transition mt-2 shadow-md text-xs md:text-sm">실적 저장 및 전송</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
-                        <h3 id="tableTitleMain" class="text-base font-bold text-slate-800">📋 데이터 내역</h3>
+                <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm mt-4 md:mt-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-5">
+                        <h3 id="tableTitleMain" class="text-sm md:text-base font-bold text-slate-800">📋 데이터 내역</h3>
                         <div id="monthTabContainer" class="hidden flex-wrap gap-1"></div>
                     </div>
                     <div class="overflow-x-auto rounded-xl border border-slate-200">
@@ -228,19 +235,19 @@
                 </div>
             </div>
 
-            <div id="rental-view" class="hidden grid grid-cols-1 xl:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
-                    <h3 id="rentalFormTitle" class="text-base font-bold text-slate-800 border-b border-slate-100 pb-4 mb-5">🚙 정산 내역 등록</h3>
+            <div id="rental-view" class="hidden grid grid-cols-1 xl:grid-cols-4 gap-4 md:gap-6">
+                <div class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                    <h3 id="rentalFormTitle" class="text-sm md:text-base font-bold text-slate-800 border-b border-slate-100 pb-3 md:pb-4 mb-4 md:mb-5">🚙 정산 내역 등록</h3>
                     <input type="hidden" id="rent-form-mode" value="insert">
                     <input type="hidden" id="rent-edit-id" value="">
-                    <div class="space-y-4">
+                    <div class="space-y-3 md:space-y-4">
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1.5">임대 귀속 월 (필수)</label>
-                            <input type="month" id="r-month" class="w-full border border-slate-200 bg-slate-50 p-2.5 rounded-lg text-sm font-bold text-blue-700 outline-none">
+                            <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">임대 귀속 월 (필수)</label>
+                            <input type="month" id="r-month" class="w-full border border-slate-200 bg-slate-50 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-blue-700 outline-none">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1.5">정산 항목</label>
-                            <select id="r-category" class="w-full border border-slate-200 p-2.5 rounded-lg text-sm font-bold text-slate-700 outline-none bg-white">
+                            <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">정산 항목</label>
+                            <select id="r-category" class="w-full border border-slate-200 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-slate-700 outline-none bg-white">
                                 <option value="1차 임대차(수동)">1차 임대차(수동)</option>
                                 <option value="1차 임대차(자동)">1차 임대차(자동)</option>
                                 <option value="2차 임대차">2차 임대차</option>
@@ -249,44 +256,44 @@
                                 <option value="기타 정산금">기타 정산금</option>
                             </select>
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-2 md:gap-3">
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500 mb-1.5">투입 대수</label>
-                                <input type="number" id="r-count" class="w-full border border-slate-200 p-2.5 rounded-lg text-sm font-bold text-slate-800 outline-none" placeholder="0대">
+                                <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">투입 대수</label>
+                                <input type="number" id="r-count" class="w-full border border-slate-200 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-slate-800 outline-none" placeholder="0대">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500 mb-1.5">공제/오류 금액</label>
-                                <input type="number" id="r-deduction" class="w-full border border-slate-200 p-2.5 rounded-lg text-sm font-bold text-rose-600 outline-none" placeholder="0">
+                                <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">공제/오류 금액</label>
+                                <input type="number" id="r-deduction" class="w-full border border-slate-200 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-rose-600 outline-none" placeholder="0">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500 mb-1.5">임대료(단가)</label>
-                                <input type="number" id="r-rent" class="w-full border border-slate-200 p-2.5 rounded-lg text-sm font-bold text-slate-800 outline-none" placeholder="0원">
+                                <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">임대료(단가)</label>
+                                <input type="number" id="r-rent" class="w-full border border-slate-200 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-slate-800 outline-none" placeholder="0원">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold text-slate-500 mb-1.5">지입료(단가)</label>
-                                <input type="number" id="r-jiip" class="w-full border border-slate-200 p-2.5 rounded-lg text-sm font-bold text-slate-800 outline-none" placeholder="0원">
+                                <label class="block text-[10px] md:text-[11px] font-bold text-slate-500 mb-1.5">지입료(단가)</label>
+                                <input type="number" id="r-jiip" class="w-full border border-slate-200 p-2 md:p-2.5 rounded-lg text-xs md:text-sm font-bold text-slate-800 outline-none" placeholder="0원">
                             </div>
                         </div>
-                        <button type="button" onclick="saveRentalData()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl transition mt-4 shadow-md text-sm">정산 내역 기록</button>
+                        <button type="button" onclick="saveRentalData()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 md:py-3.5 rounded-xl transition mt-3 md:mt-4 shadow-md text-xs md:text-sm">정산 내역 기록</button>
                     </div>
                 </div>
-                <div class="xl:col-span-3 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex justify-between items-center mb-5"><h3 class="text-base font-bold text-slate-800">📋 차량 임대/지입 정산 대장</h3></div>
-                    <div class="overflow-x-auto rounded-xl border border-slate-200 max-h-[600px] overflow-y-auto">
+                <div class="xl:col-span-3 bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4 md:mb-5"><h3 class="text-sm md:text-base font-bold text-slate-800">📋 차량 임대/지입 정산 대장</h3></div>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 max-h-[400px] md:max-h-[600px] overflow-y-auto">
                         <table class="w-full text-center border-collapse whitespace-nowrap min-w-[700px]">
                             <thead class="sticky top-0 bg-slate-50 z-10 shadow-sm">
-                                <tr class="text-slate-500 font-bold border-b border-slate-200 text-[11px] uppercase tracking-wider">
-                                    <th class="p-3 text-left">귀속월</th>
-                                    <th class="p-3 text-left">항목</th>
-                                    <th class="p-3">투입대수</th>
-                                    <th class="p-3">임대료(단가)</th>
-                                    <th class="p-3">지입료(단가)</th>
-                                    <th class="p-3 text-rose-500">공제오류금</th>
-                                    <th class="p-3 text-emerald-600 text-right">최종수익</th>
-                                    <th class="p-3 text-center">관리</th>
+                                <tr class="text-slate-500 font-bold border-b border-slate-200 text-[10px] md:text-[11px] uppercase tracking-wider">
+                                    <th class="p-2 md:p-3 text-left">귀속월</th>
+                                    <th class="p-2 md:p-3 text-left">항목</th>
+                                    <th class="p-2 md:p-3">투입대수</th>
+                                    <th class="p-2 md:p-3">임대료(단가)</th>
+                                    <th class="p-2 md:p-3">지입료(단가)</th>
+                                    <th class="p-2 md:p-3 text-rose-500">공제오류금</th>
+                                    <th class="p-2 md:p-3 text-emerald-600 text-right">최종수익</th>
+                                    <th class="p-2 md:p-3 text-center">관리</th>
                                 </tr>
                             </thead>
-                            <tbody id="rentalTableBody" class="divide-y divide-slate-100 text-slate-600 text-xs font-medium">
+                            <tbody id="rentalTableBody" class="divide-y divide-slate-100 text-slate-600 text-[11px] md:text-xs font-medium">
                             </tbody>
                         </table>
                     </div>
@@ -297,7 +304,7 @@
     </main>
 
     <div id="loadingModal" class="fixed inset-0 bg-slate-900/40 hidden items-center justify-center z-50 backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center"><div class="loader mb-4"></div><p class="text-sm font-bold text-slate-800">구글 시트 동기화 중...</p></div>
+        <div class="bg-white p-5 md:p-6 rounded-2xl shadow-xl flex flex-col items-center"><div class="loader mb-4"></div><p class="text-xs md:text-sm font-bold text-slate-800">구글 시트 동기화 중...</p></div>
     </div>
 
     <script>
@@ -334,11 +341,10 @@
             return String(h).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
         }
 
-        // Navigation States
-        let currentNav = 'YEARLY';
+        // 💡 연간 KPI 삭제 후, 기본 로딩 뷰를 MONTHLY_KPI로 변경
+        let currentNav = 'MONTHLY_KPI';
         let currentSelectedMonth = String(new Date().getMonth() + 1).padStart(2, '0'); 
 
-        // Chart Layout Config
         const commonGrid = { color: '#f1f5f9', drawBorder: false, borderDash: [4, 4] };
 
         function getAbsoluteWeek(dateStr) {
@@ -364,7 +370,7 @@
             for(let m=1; m<=12; m++) {
                 const mStr = String(m).padStart(2, '0');
                 const activeClass = (mStr === currentSelectedMonth) ? 'active' : '';
-                html += `<button onclick="changeDetailMonth('${mStr}')" class="month-tab px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm ${activeClass}">${m}월</button>`;
+                html += `<button onclick="changeDetailMonth('${mStr}')" class="month-tab px-2.5 md:px-3 py-1 md:py-1.5 text-[10px] md:text-xs font-semibold rounded-lg shadow-sm ${activeClass}">${m}월</button>`;
             }
             container.innerHTML = html;
         }
@@ -387,7 +393,8 @@
         function setNavView(view) {
             currentNav = view;
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${view}`).classList.add('active');
+            const targetBtn = document.getElementById(`nav-${view}`);
+            if(targetBtn) targetBtn.classList.add('active');
             
             const monthTabContainer = document.getElementById('monthTabContainer');
             const viewTitle = document.getElementById('currentViewTitle');
@@ -420,7 +427,7 @@
             document.getElementById('log-form-mode').value = 'insert';
             document.getElementById('formPanelTitle').innerText = '✍️ 일일 실적 기록';
             document.getElementById('btn-save').innerText = '실적 저장 및 전송';
-            document.getElementById('btn-save').className = "w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition mt-2 shadow-md text-sm";
+            document.getElementById('btn-save').className = "w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 md:py-3.5 rounded-xl transition mt-2 shadow-md text-xs md:text-sm";
             document.getElementById('i-date').readOnly = false;
             document.querySelectorAll('#dataFormContainer input:not(#i-date)').forEach(i => i.value = '');
         }
@@ -448,7 +455,7 @@
             document.getElementById('i-delay').value = record.delay;
             
             document.getElementById('btn-save').innerText = '실적 업데이트 덮어쓰기';
-            document.getElementById('btn-save').className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl transition mt-2 shadow-md text-sm";
+            document.getElementById('btn-save').className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 md:py-3.5 rounded-xl transition mt-2 shadow-md text-xs md:text-sm";
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -555,16 +562,14 @@
         let logisticsDB = [];
         let rentalDB = [];
 
-        // 💡 [수정됨] 자가 진단 기능이 탑재된 데이터 연동 함수
         async function fetchDataFromGoogle() {
             if (SCRIPT_URL.includes("여기에_복사한_URL_주소를_넣어주세요")) return;
             showLoading(true);
             
             try {
                 const res = await fetch(SCRIPT_URL);
-                const text = await res.text(); // JSON 변환 전 원본 텍스트 확인
+                const text = await res.text();
                 
-                // 만약 구글 웹페이지(HTML) 코드가 튀어나온다면 권한 문제임
                 if (text.trim().startsWith("<")) {
                     throw new Error("JSON이 아닌 HTML(구글 로그인 화면 등)이 반환되었습니다.");
                 }
@@ -578,7 +583,7 @@
                 
             } catch (e) { 
                 console.error("자가 진단 에러 내용:", e);
-                alert("🚨 데이터 통신 차단됨 🚨\n\n원인: " + e.message + "\n\n💡 해결 방법:\n위 메시지가 'JSON이 아닌 HTML 반환'이거나 'Failed to fetch'라면 100% 구글 배포 설정 문제입니다. 앱스 스크립트 배포 시 [액세스 권한이 있는 사용자]를 반드시 [모든 사용자(Anyone)]로 설정한 후 '새 URL'을 받아주세요."); 
+                alert("🚨 데이터 통신 차단됨 🚨\n\n원인: " + e.message + "\n\n💡 해결 방법:\n앱스 스크립트 배포 시 [액세스 권한이 있는 사용자]를 반드시 [모든 사용자(Anyone)]로 설정한 후 '새 URL'을 받아주세요."); 
             } finally { 
                 showLoading(false); 
             }
@@ -592,14 +597,14 @@
             rentalDB.forEach(r => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-3 text-left font-bold text-blue-700">${r.month}</td>
-                        <td class="p-3 text-left font-bold text-slate-700">${r.category}</td>
-                        <td class="p-3 font-bold">${r.count}대</td>
-                        <td class="p-3">${r.rentFee.toLocaleString()}</td>
-                        <td class="p-3">${r.jiipFee.toLocaleString()}</td>
-                        <td class="p-3 font-bold text-rose-600">${r.deduction.toLocaleString()}</td>
-                        <td class="p-3 font-black text-emerald-600 text-right bg-emerald-50/40">${r.total.toLocaleString()}원</td>
-                        <td class="p-3 text-center border-l border-slate-100">
+                        <td class="p-2 md:p-3 text-left font-bold text-blue-700">${r.month}</td>
+                        <td class="p-2 md:p-3 text-left font-bold text-slate-700">${r.category}</td>
+                        <td class="p-2 md:p-3 font-bold">${r.count}대</td>
+                        <td class="p-2 md:p-3">${r.rentFee.toLocaleString()}</td>
+                        <td class="p-2 md:p-3">${r.jiipFee.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 font-bold text-rose-600">${r.deduction.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 font-black text-emerald-600 text-right bg-emerald-50/40">${r.total.toLocaleString()}원</td>
+                        <td class="p-2 md:p-3 text-center border-l border-slate-100">
                             <button onclick="editRentalRecord('${r.id}')" class="text-blue-500 mr-2">수정</button>
                             <button onclick="deleteRentalRecord('${r.id}')" class="text-rose-500">삭제</button>
                         </td>
@@ -674,18 +679,14 @@
 
             const elDelay = document.getElementById('kpi-delay');
             if(elDelay) {
-                if(Number(avgDelay) > 3) elDelay.className = "text-xl xl:text-2xl font-black text-rose-600 mt-1.5 truncate";
-                else if (Number(avgDelay) > 1) elDelay.className = "text-xl xl:text-2xl font-black text-amber-500 mt-1.5 truncate";
-                else elDelay.className = "text-xl xl:text-2xl font-black text-slate-800 mt-1.5 truncate";
+                if(Number(avgDelay) > 3) elDelay.className = "text-lg md:text-xl xl:text-2xl font-black text-rose-600 mt-1.5 truncate";
+                else if (Number(avgDelay) > 1) elDelay.className = "text-lg md:text-xl xl:text-2xl font-black text-amber-500 mt-1.5 truncate";
+                else elDelay.className = "text-lg md:text-xl xl:text-2xl font-black text-slate-800 mt-1.5 truncate";
             }
 
             let viewData = [];
-            if (currentNav === 'YEARLY') {
-                const grouped = {};
-                initGroup(grouped, '2026', '2026년 연간 누적', '2026-12-31');
-                filteredDB.forEach(r => addRecordToGroup(grouped['2026'], r));
-                viewData = Object.values(grouped);
-            } else if (currentNav === 'MONTHLY_KPI') {
+            
+            if (currentNav === 'MONTHLY_KPI') {
                 const grouped = {};
                 filteredDB.forEach(r => {
                     let key = r.date ? r.date.substring(0, 7) : '0000-00';
@@ -764,8 +765,7 @@
 
             const mainTable = document.getElementById('mainTable');
             let labelTitle = '';
-            if (currentNav === 'YEARLY') labelTitle = "연간 총 요약 기록 대장 (합계 및 평균)";
-            else if (currentNav === 'MONTHLY_KPI') labelTitle = "월별 KPI 요약 대장 (합계 및 평균)";
+            if (currentNav === 'MONTHLY_KPI') labelTitle = "월별 KPI 요약 대장 (합계 및 평균)";
             else if (currentNav === 'WEEKLY_KPI') labelTitle = "주별 KPI 요약 대장 (합계 및 평균)";
             else labelTitle = `${parseInt(currentSelectedMonth)}월 일별 운영 상세 기록 대장`;
             
@@ -773,38 +773,38 @@
 
             let thead = `
                 <thead><tr class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200 text-[10px] uppercase tracking-wider">
-                    <th class="p-3 text-left w-24">구분/일자</th>
-                    <th class="p-3 text-slate-800">물동량</th>
-                    <th class="p-3">가구수</th>
-                    <th class="p-3 border-l border-slate-200 text-blue-600">총대수</th>
-                    <th class="p-3 bg-slate-100/50">지입</th>
-                    <th class="p-3 bg-slate-100/50 border-r border-slate-200 text-amber-600">용차</th>
-                    <th class="p-3 text-cyan-600">생산성</th>
+                    <th class="p-2 md:p-3 text-left w-24">구분/일자</th>
+                    <th class="p-2 md:p-3 text-slate-800">물동량</th>
+                    <th class="p-2 md:p-3">가구수</th>
+                    <th class="p-2 md:p-3 border-l border-slate-200 text-blue-600">총대수</th>
+                    <th class="p-2 md:p-3 bg-slate-100/50">지입</th>
+                    <th class="p-2 md:p-3 bg-slate-100/50 border-r border-slate-200 text-amber-600">용차</th>
+                    <th class="p-2 md:p-3 text-cyan-600">생산성</th>
                     
-                    <th class="p-3 bg-slate-50/50 border-l border-slate-200">1차 가구</th>
-                    <th class="p-3 bg-slate-50/50">1차 배차</th>
-                    <th class="p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400">1차 단회</th>
-                    <th class="p-3 bg-indigo-50/30 text-slate-700">3차 가구</th>
-                    <th class="p-3 bg-indigo-50/30 text-slate-700">3차 배차</th>
-                    <th class="p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600">3차 단회</th>
+                    <th class="p-2 md:p-3 bg-slate-50/50 border-l border-slate-200">1차 가구</th>
+                    <th class="p-2 md:p-3 bg-slate-50/50">1차 배차</th>
+                    <th class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400">1차 단회</th>
+                    <th class="p-2 md:p-3 bg-indigo-50/30 text-slate-700">3차 가구</th>
+                    <th class="p-2 md:p-3 bg-indigo-50/30 text-slate-700">3차 배차</th>
+                    <th class="p-2 md:p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600">3차 단회</th>
                     
-                    <th class="p-3">간선막차</th>
-                    <th class="p-3">최종출차</th>
-                    <th class="p-3 text-rose-600">지연배송율</th>
-                    <th class="p-3 text-purple-600">점착/BOX</th>
-                    <th class="p-3 text-emerald-600 text-right">매출액(원)</th>
-                    ${!isAggr ? '<th class="p-3 text-center border-l border-slate-200">관리</th>' : ''}
-                </tr></thead><tbody id="mainTbody" class="divide-y divide-slate-100 text-slate-600 text-[11px] font-medium"></tbody>`;
+                    <th class="p-2 md:p-3">간선막차</th>
+                    <th class="p-2 md:p-3">최종출차</th>
+                    <th class="p-2 md:p-3 text-rose-600">지연배송율</th>
+                    <th class="p-2 md:p-3 text-purple-600">점착/BOX</th>
+                    <th class="p-2 md:p-3 text-emerald-600 text-right">매출액(원)</th>
+                    ${!isAggr ? '<th class="p-2 md:p-3 text-center border-l border-slate-200">관리</th>' : ''}
+                </tr></thead><tbody id="mainTbody" class="divide-y divide-slate-100 text-slate-600 text-[10px] md:text-[11px] font-medium"></tbody>`;
             
             mainTable.innerHTML = thead;
             const mainTbody = document.getElementById('mainTbody');
 
             if (viewData.length === 0) {
-                mainTbody.innerHTML = `<tr><td colspan="${isAggr?18:19}" class="p-8 text-slate-400">조회 범위 내 데이터가 없습니다.</td></tr>`;
+                mainTbody.innerHTML = `<tr><td colspan="${isAggr?18:19}" class="p-6 md:p-8 text-slate-400">조회 범위 내 데이터가 없습니다.</td></tr>`;
                 return;
             }
 
-            const formatCell = (sum, avg) => `${sum.toLocaleString()}<br><span class="text-[9px] text-slate-400 font-normal mt-0.5 inline-block">평균 ${avg.toLocaleString()}</span>`;
+            const formatCell = (sum, avg) => `${sum.toLocaleString()}<br><span class="text-[8px] md:text-[9px] text-slate-400 font-normal mt-0.5 inline-block">평균 ${avg.toLocaleString()}</span>`;
 
             viewData.forEach(r => {
                 const cv = safeNum(r.owned) + safeNum(r.hired);
@@ -817,9 +817,7 @@
                 let cellRevHtml = '';
                 if(isAggr) {
                     let monthlyRent = 0;
-                    if(currentNav === 'YEARLY') {
-                        rentalDB.forEach(rent => monthlyRent += rent.total);
-                    } else if (currentNav === 'MONTHLY_KPI') { 
+                    if (currentNav === 'MONTHLY_KPI') { 
                         rentalDB.forEach(rent => { if(rent.month === r.key) monthlyRent += rent.total; }); 
                     } else if (currentNav === 'WEEKLY_KPI') {
                         rentalDB.forEach(rent => { if(rent.month && r.label.includes(rent.month.substring(5,7))) monthlyRent += rent.total / 4.3; }); 
@@ -831,12 +829,12 @@
                     
                     cellRevHtml = `
                         <div class="text-right leading-tight">
-                            <span class="text-emerald-600 font-bold text-[12px]">${mTotal.toLocaleString()}</span><br>
-                            <span class="text-[9px] text-slate-400 font-normal">물류: ${mKurly.toLocaleString()}</span><br>
-                            <span class="text-[9px] text-blue-500 font-bold">임대: ${monthlyRent.toLocaleString()}</span>
+                            <span class="text-emerald-600 font-bold text-[11px] md:text-[12px]">${mTotal.toLocaleString()}</span><br>
+                            <span class="text-[8px] md:text-[9px] text-slate-400 font-normal">물류: ${mKurly.toLocaleString()}</span><br>
+                            <span class="text-[8px] md:text-[9px] text-blue-500 font-bold">임대: ${monthlyRent.toLocaleString()}</span>
                         </div>`;
                 } else {
-                    cellRevHtml = `<span class="font-bold text-emerald-600 text-[12px]">${(r.box*UNIT_REVENUE).toLocaleString()}</span>`;
+                    cellRevHtml = `<span class="font-bold text-emerald-600 text-[11px] md:text-[12px]">${(r.box*UNIT_REVENUE).toLocaleString()}</span>`;
                 }
 
                 let tr = `<tr class="hover:bg-slate-50 transition border-b border-slate-100">`;
@@ -847,58 +845,58 @@
                     const avgDrop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
                     
                     tr += `
-                        <td class="p-3 text-left font-bold text-slate-800 align-middle">${r.label}</td>
-                        <td class="p-3 font-black text-slate-900 leading-snug align-middle">${formatCell(r.box, avgBox)}</td>
-                        <td class="p-3 font-bold leading-snug align-middle">${formatCell(ch, Math.round(ch/count))}</td>
-                        <td class="p-3 font-bold border-l border-slate-200 text-blue-600 leading-snug align-middle">${formatCell(cv, avgCv)}</td>
-                        <td class="p-3 bg-slate-50/50 leading-snug align-middle">${formatCell(r.owned, Math.round(r.owned/count))}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600 leading-snug align-middle">${formatCell(r.hired, Math.round(r.hired/count))}</td>
-                        <td class="p-3 font-bold text-cyan-600 align-middle">${avgCp}</td>
+                        <td class="p-2 md:p-3 text-left font-bold text-slate-800 align-middle">${r.label}</td>
+                        <td class="p-2 md:p-3 font-black text-slate-900 leading-snug align-middle">${formatCell(r.box, avgBox)}</td>
+                        <td class="p-2 md:p-3 font-bold leading-snug align-middle">${formatCell(ch, Math.round(ch/count))}</td>
+                        <td class="p-2 md:p-3 font-bold border-l border-slate-200 text-blue-600 leading-snug align-middle">${formatCell(cv, avgCv)}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 leading-snug align-middle">${formatCell(r.owned, Math.round(r.owned/count))}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600 leading-snug align-middle">${formatCell(r.hired, Math.round(r.hired/count))}</td>
+                        <td class="p-2 md:p-3 font-bold text-cyan-600 align-middle">${avgCp}</td>
                         
-                        <td class="p-3 bg-slate-50/50 border-l border-slate-200 leading-snug align-middle">${formatCell(r.r1House, Math.round(r.r1House/count))}</td>
-                        <td class="p-3 bg-slate-50/50 leading-snug align-middle">${formatCell(r.r1Veh, (r.r1Veh/count).toFixed(1))}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400 leading-snug align-middle">${formatCell(r.r1Sin, (r.r1Sin/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 border-l border-slate-200 leading-snug align-middle">${formatCell(r.r1House, Math.round(r.r1House/count))}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 leading-snug align-middle">${formatCell(r.r1Veh, (r.r1Veh/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400 leading-snug align-middle">${formatCell(r.r1Sin, (r.r1Sin/count).toFixed(1))}</td>
                         
-                        <td class="p-3 bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3House, Math.round(r.r3House/count))}</td>
-                        <td class="p-3 bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3Veh, (r.r3Veh/count).toFixed(1))}</td>
-                        <td class="p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600 leading-snug align-middle">${formatCell(r.r3Sin, (r.r3Sin/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3House, Math.round(r.r3House/count))}</td>
+                        <td class="p-2 md:p-3 bg-indigo-50/30 leading-snug align-middle">${formatCell(r.r3Veh, (r.r3Veh/count).toFixed(1))}</td>
+                        <td class="p-2 md:p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600 leading-snug align-middle">${formatCell(r.r3Sin, (r.r3Sin/count).toFixed(1))}</td>
                         
-                        <td class="p-3 align-middle text-slate-500">${r.trunkCount>0 ? minsToTime(r.timeTrunkMins/r.trunkCount) : '-'}</td>
-                        <td class="p-3 align-middle text-slate-500">${r.departCount>0 ? minsToTime(r.timeDepartMins/r.departCount) : '-'}</td>
-                        <td class="p-3 align-middle"><span class="${delayClass}">${rawDelay.toFixed(2)}%</span></td>
-                        <td class="p-3 font-bold text-purple-600 align-middle">${avgDrop}</td>
-                        <td class="p-3 align-middle border-l border-slate-100">${cellRevHtml}</td>
+                        <td class="p-2 md:p-3 align-middle text-slate-500">${r.trunkCount>0 ? minsToTime(r.timeTrunkMins/r.trunkCount) : '-'}</td>
+                        <td class="p-2 md:p-3 align-middle text-slate-500">${r.departCount>0 ? minsToTime(r.timeDepartMins/r.departCount) : '-'}</td>
+                        <td class="p-2 md:p-3 align-middle"><span class="${delayClass}">${rawDelay.toFixed(2)}%</span></td>
+                        <td class="p-2 md:p-3 font-bold text-purple-600 align-middle">${avgDrop}</td>
+                        <td class="p-2 md:p-3 align-middle border-l border-slate-100">${cellRevHtml}</td>
                     `;
                 } else {
                     const cp = cv === 0 ? 0 : (r.box/cv).toFixed(1);
                     const drop = ch === 0 ? 0 : (r.box/ch).toFixed(2);
                     
                     tr += `
-                        <td class="p-3 text-left font-bold text-slate-800">${r.date}</td>
-                        <td class="p-3 font-black text-slate-900">${r.box.toLocaleString()}</td>
-                        <td class="p-3 font-bold">${ch.toLocaleString()}</td>
-                        <td class="p-3 font-bold border-l border-slate-200 text-blue-600">${cv}</td>
-                        <td class="p-3 bg-slate-50/50">${r.owned}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600">${r.hired}</td>
-                        <td class="p-3 font-bold text-cyan-600">${cp}</td>
+                        <td class="p-2 md:p-3 text-left font-bold text-slate-800">${r.date}</td>
+                        <td class="p-2 md:p-3 font-black text-slate-900">${r.box.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 font-bold">${ch.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 font-bold border-l border-slate-200 text-blue-600">${cv}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50">${r.owned}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-amber-600">${r.hired}</td>
+                        <td class="p-2 md:p-3 font-bold text-cyan-600">${cp}</td>
                         
-                        <td class="p-3 bg-slate-50/50 border-l border-slate-200">${r.r1House.toLocaleString()}</td>
-                        <td class="p-3 bg-slate-50/50">${r.r1Veh}</td>
-                        <td class="p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400">${r.r1Sin}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 border-l border-slate-200">${r.r1House.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50">${r.r1Veh}</td>
+                        <td class="p-2 md:p-3 bg-slate-50/50 border-r border-slate-200 text-indigo-400">${r.r1Sin}</td>
                         
-                        <td class="p-3 bg-indigo-50/30">${r.r3House.toLocaleString()}</td>
-                        <td class="p-3 bg-indigo-50/30">${r.r3Veh}</td>
-                        <td class="p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600">${r.r3Sin}</td>
+                        <td class="p-2 md:p-3 bg-indigo-50/30">${r.r3House.toLocaleString()}</td>
+                        <td class="p-2 md:p-3 bg-indigo-50/30">${r.r3Veh}</td>
+                        <td class="p-2 md:p-3 bg-indigo-50/30 border-r border-slate-200 text-cyan-600">${r.r3Sin}</td>
                         
-                        <td class="p-3 text-slate-500">${r.timeTrunk || '-'}</td>
-                        <td class="p-3 text-slate-500">${r.timeDepart || '-'}</td>
-                        <td class="p-3"><span class="${delayClass}">${rawDelay}%</span></td>
-                        <td class="p-3 font-bold text-purple-600">${drop}</td>
-                        <td class="p-3 border-l border-slate-100">${cellRevHtml}</td>
-                        <td class="p-3 text-center border-l border-slate-200">
-                            <div class="flex items-center justify-center gap-2">
-                                <button onclick="editLogRecord('${r.date}')" class="text-blue-500 hover:text-blue-700" title="수정"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
-                                <button onclick="deleteLogRecord('${r.date}')" class="text-rose-500 hover:text-rose-700" title="삭제"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                        <td class="p-2 md:p-3 text-slate-500">${r.timeTrunk || '-'}</td>
+                        <td class="p-2 md:p-3 text-slate-500">${r.timeDepart || '-'}</td>
+                        <td class="p-2 md:p-3"><span class="${delayClass}">${rawDelay}%</span></td>
+                        <td class="p-2 md:p-3 font-bold text-purple-600">${drop}</td>
+                        <td class="p-2 md:p-3 border-l border-slate-100">${cellRevHtml}</td>
+                        <td class="p-2 md:p-3 text-center border-l border-slate-200">
+                            <div class="flex items-center justify-center gap-1.5 md:gap-2">
+                                <button onclick="editLogRecord('${r.date}')" class="text-blue-500 hover:text-blue-700" title="수정"><svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                                <button onclick="deleteLogRecord('${r.date}')" class="text-rose-500 hover:text-rose-700" title="삭제"><svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                             </div>
                         </td>
                     `;
@@ -948,7 +946,7 @@
         document.getElementById('i-date').value = new Date().toISOString().split('T')[0];
         document.getElementById('r-month').value = new Date().toISOString().substring(0, 7);
         if(SCRIPT_URL !== "여기에_복사한_URL_주소를_넣어주세요") fetchDataFromGoogle();
-        else { setNavView('YEARLY'); }
+        else { setNavView('MONTHLY_KPI'); }
     </script>
 </body>
 </html>
