@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>컬리 운영 KPI 통합 대시보드</title>
+    <title>물류운영 KPI 통합 대시보드 Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
@@ -11,13 +11,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Inter', 'Pretendard', sans-serif; background-color: #f8fafc; color: #0f172a; }
         
-        /* Custom Scrollbar for Main Content */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Hide scrollbar for mobile top nav */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         
@@ -25,12 +23,10 @@
         .kpi-card { background: #ffffff; border: 1px solid #e2e8f0; border-top-width: 4px; transition: transform 0.2s, box-shadow 0.2s; }
         .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
         
-        /* Sidebar/Top Navigation */
         .nav-item.active { background-color: #3b82f6; color: white; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3); font-weight: 700;}
         .nav-item { color: #64748b; transition: all 0.2s; font-weight: 600;}
         .nav-item:hover:not(.active) { background-color: #f1f5f9; color: #0f172a; }
         
-        /* Month Tabs */
         .month-tab.active { background-color: #1e293b; color: white; font-weight: 700; border-color: #1e293b; }
         .month-tab { color: #475569; background-color: white; border: 1px solid #cbd5e1; transition: all 0.15s; }
         .month-tab:hover:not(.active) { background-color: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
@@ -40,6 +36,17 @@
         
         .loader { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 💡 KPI 카드 크기 미세 조절을 위한 커스텀 그리드 (PC 화면 전용) */
+        @media (min-width: 1280px) {
+            .kpi-grid-custom {
+                display: grid;
+                /* 왼쪽부터 1~8번 카드의 비율 (1fr = 기본 1칸 크기) */
+                /* 매출(1.4), 순이익(1.4), 물동량(1.1), 생산성(1), 분포율(1), 용차(1), 단회(1), 지연배송(1.2) */
+                grid-template-columns: 1.4fr 1.4fr 1.1fr 1fr 1fr 1fr 1fr 1.2fr;
+                gap: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col md:flex-row h-screen overflow-hidden">
@@ -97,50 +104,58 @@
         <div id="dashboard-wrapper" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             
             <div id="dashboard-view" class="space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-12 gap-3">
-                    <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #64748b;">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 kpi-grid-custom">
+                    
+                    <div class="kpi-card p-4 md:p-5 rounded-2xl relative overflow-hidden flex flex-col justify-center" style="border-top-color: #64748b;">
                         <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-slate-100 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">총 정산 매출액</p>
-                        <p id="kpi-revenue" class="text-lg md:text-xl xl:text-[1.55rem] font-black text-slate-800 mt-2 tracking-tight break-all whitespace-normal">0원</p>
+                        <p id="kpi-revenue" class="text-lg md:text-xl xl:text-2xl font-black text-slate-800 mt-2 tracking-tight break-all whitespace-normal">0원</p>
                         <p id="kpi-revenue-desc" class="text-[9px] md:text-[10px] text-slate-400 mt-2 font-medium">물류매출 + 임대수익</p>
                     </div>
-                    <div class="kpi-card p-4 md:p-5 rounded-2xl xl:col-span-2 relative overflow-hidden" style="border-top-color: #10b981;">
+                    
+                    <div class="kpi-card p-4 md:p-5 rounded-2xl relative overflow-hidden flex flex-col justify-center" style="border-top-color: #10b981;">
                         <div class="absolute top-0 right-0 w-12 md:w-16 h-12 md:h-16 bg-emerald-50 rounded-bl-full"></div>
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider">영업 순이익</p>
-                        <p id="kpi-profit" class="text-lg md:text-xl xl:text-[1.55rem] font-black text-emerald-600 mt-2 tracking-tight break-all whitespace-normal">0원</p>
-                        <p id="kpi-profit-desc" class="text-[9px] md:text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-1.5 md:px-2 py-0.5 rounded border border-emerald-100">마진(2.99%) + 임대수익</p>
+                        <p id="kpi-profit" class="text-lg md:text-xl xl:text-2xl font-black text-emerald-600 mt-2 tracking-tight break-all whitespace-normal">0원</p>
+                        <p id="kpi-profit-desc" class="text-[9px] md:text-[10px] text-emerald-600 font-bold mt-2 bg-emerald-50 inline-block px-1.5 md:px-2 py-0.5 rounded border border-emerald-100 self-start">마진(2.99%) + 임대수익</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-2" style="border-top-color: #3b82f6;">
+                    
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-center" style="border-top-color: #3b82f6;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">누적 물동량</p>
                         <p id="kpi-box" class="text-lg md:text-xl xl:text-2xl font-extrabold text-slate-800 mt-1.5 truncate">0</p>
-                        <p class="text-[9px] md:text-[10px] text-blue-600 font-bold mt-2 bg-blue-50 inline-block px-1 rounded">전체 출고</p>
+                        <p class="text-[9px] md:text-[10px] text-blue-600 font-bold mt-2 bg-blue-50 inline-block px-1 rounded self-start">전체 출고</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #6366f1;">
+                    
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-center" style="border-top-color: #6366f1;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">차량당 생산성</p>
-                        <p id="kpi-prod" class="text-lg md:text-xl xl:text-2xl font-extrabold text-indigo-600 mt-1.5 truncate">0</p>
+                        <p id="kpi-prod" class="text-lg md:text-xl xl:text-xl font-extrabold text-indigo-600 mt-1.5 truncate">0</p>
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">평균 처리 건수</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #8b5cf6;">
+                    
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-center" style="border-top-color: #8b5cf6;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">박스분포율</p>
-                        <p id="kpi-drop-size" class="text-lg md:text-xl xl:text-2xl font-extrabold text-purple-600 mt-1.5 truncate">0</p>
+                        <p id="kpi-drop-size" class="text-lg md:text-xl xl:text-xl font-extrabold text-purple-600 mt-1.5 truncate">0</p>
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">점착/BOX</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #f59e0b;">
+                    
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-center" style="border-top-color: #f59e0b;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">용차 의존도</p>
-                        <p id="kpi-hired" class="text-lg md:text-xl xl:text-2xl font-extrabold text-amber-600 mt-1.5 truncate">0%</p>
+                        <p id="kpi-hired" class="text-lg md:text-xl xl:text-xl font-extrabold text-amber-600 mt-1.5 truncate">0%</p>
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">스팟 차량 비율</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-1" style="border-top-color: #06b6d4;">
+                    
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-center" style="border-top-color: #06b6d4;">
                         <p class="text-[10px] xl:text-[11px] font-bold text-slate-500 tracking-wider truncate">단회 운행</p>
-                        <p id="kpi-single" class="text-lg md:text-xl xl:text-2xl font-extrabold text-cyan-600 mt-1.5 truncate">0%</p>
+                        <p id="kpi-single" class="text-lg md:text-xl xl:text-xl font-extrabold text-cyan-600 mt-1.5 truncate">0%</p>
                         <p class="text-[9px] md:text-[10px] text-slate-400 mt-2">1/3차 단회전</p>
                     </div>
-                    <div class="kpi-card p-3 md:p-4 rounded-2xl xl:col-span-2 flex flex-col justify-between" style="border-top-color: #ef4444;">
+                    
+                    <div class="kpi-card p-3 md:p-4 rounded-2xl flex flex-col justify-center" style="border-top-color: #ef4444;">
                         <div>
                             <p class="text-[9px] md:text-[10px] xl:text-[11px] font-bold text-slate-500 flex flex-wrap justify-between items-center gap-1">
                                 지연배송율 <span id="kpi-success" class="text-[8px] md:text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded border border-emerald-100 whitespace-nowrap"></span>
                             </p>
-                            <p id="kpi-delay" class="text-lg md:text-xl xl:text-2xl font-black text-slate-800 mt-1.5 truncate">0%</p>
+                            <p id="kpi-delay" class="text-lg md:text-xl xl:text-xl font-black text-slate-800 mt-1.5 truncate">0%</p>
                         </div>
                         <div class="flex items-center gap-1 mt-2 text-[8px] md:text-[9px] font-bold text-slate-500">
                             <span class="text-rose-600 bg-rose-50 px-1 rounded">>3%</span>
@@ -179,7 +194,7 @@
                                 <h3 class="text-sm md:text-base font-extrabold text-indigo-900">AI 운영 추이 및 예측 리포트</h3>
                             </div>
                             <div id="aiReportContent" class="text-[11px] md:text-xs text-indigo-800 space-y-2.5 leading-relaxed font-medium">
-                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -673,7 +688,6 @@
             let dm=timeToMins(r.timeDepart); if(dm!==null){g.timeDepartMins+=dm; g.departCount++;}
         }
 
-        // ✨ 핵심 기능: AI 리포트 생성기 (일평균 보정 알고리즘 탑재)
         function generateAIReport() {
             const aiBox = document.getElementById('aiReportContent');
             if (!aiBox) return;
@@ -742,7 +756,6 @@
                     const currentPeriod = currentViewData[dataLen-1];
                     const prevPeriod = currentViewData[dataLen-2];
                     
-                    // 💡 핵심: 진행 중인 데이터 보정을 위해 '일평균' 기준으로 비교 (억울한 감소 방지)
                     const currAvg = safeNum(currentPeriod.box) / (currentPeriod.count || 1);
                     const prevAvg = safeNum(prevPeriod.box) / (prevPeriod.count || 1);
                     
@@ -751,7 +764,6 @@
                     
                     const estTotalBox = Math.round(currAvg * expectedDays);
                     
-                    // 주별 대장은 임대수익 무조건 배제 (0 처리)
                     let periodRent = 0;
                     if (currentNav === 'MONTHLY_KPI') {
                         rentalDB.forEach(rent => { if(rent.month === currentPeriod.key) periodRent += rent.total; }); 
@@ -839,9 +851,9 @@
 
             const elDelay = document.getElementById('kpi-delay');
             if(elDelay) {
-                if(Number(avgDelay) > 3) elDelay.className = "text-lg md:text-xl xl:text-2xl font-black text-rose-600 mt-1.5 truncate";
-                else if (Number(avgDelay) > 1) elDelay.className = "text-lg md:text-xl xl:text-2xl font-black text-amber-500 mt-1.5 truncate";
-                else elDelay.className = "text-lg md:text-xl xl:text-2xl font-black text-slate-800 mt-1.5 truncate";
+                if(Number(avgDelay) > 3) elDelay.className = "text-lg md:text-xl xl:text-xl font-black text-rose-600 mt-1.5 truncate";
+                else if (Number(avgDelay) > 1) elDelay.className = "text-lg md:text-xl xl:text-xl font-black text-amber-500 mt-1.5 truncate";
+                else elDelay.className = "text-lg md:text-xl xl:text-xl font-black text-slate-800 mt-1.5 truncate";
             }
 
             let viewData = [];
